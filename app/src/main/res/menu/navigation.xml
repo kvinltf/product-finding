@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/bottom_navigation_login"
+        android:icon="@drawable/ic_icons_login"
+        android:title="@string/bottom_navigation_title_login" />
+
+    <item
+        android:id="@+id/bottom_navigation_register"
+        android:icon="@drawable/ic_icons_register"
+        android:title="@string/bottom_navigation_title_register" />
+
+    <item
+        android:id="@+id/bottom_navigation_forget_password"
+        android:icon="@drawable/ic_icons_reset"
+        android:title="@string/bottom_navigation_title_forget_password" />
+</menu>
