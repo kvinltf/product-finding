@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Product Finding</string>
+    <!--Activity Title-->
+    <string name="title_activity_login">Login</string>
+    <!--Bottom Navigation Text-->
+    <string name="bottom_navigation_title_login">Login</string>
+    <string name="bottom_navigation_title_register">Register</string>
+    <string name="bottom_navigation_title_forget_password">Forget Password</string>
 </resources>
