@@ -2,6 +2,7 @@ package com.example.productfinding;
 
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
@@ -10,24 +11,25 @@ public class LoginActivity extends AppCompatActivity {
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
-        FragmentManager fragmentManager = getSupportFragmentManager();
 
         switch (item.getItemId()) {
             case R.id.bottom_navigation_login:
-                LoginFragment loginFragment = new LoginFragment();
-                fragmentManager.beginTransaction().replace(R.id.login_layout_content, loginFragment).commit();
+                replaceFragment(new LoginFragment());
                 return true;
             case R.id.bottom_navigation_register:
-                RegisterFragment registerFragment = new RegisterFragment();
-                fragmentManager.beginTransaction().replace(R.id.login_layout_content, registerFragment).commit();
+                replaceFragment(new RegisterFragment());
                 return true;
             case R.id.bottom_navigation_forget_password:
-                ResetPasswordFragment resetPasswordFragment = new ResetPasswordFragment();
-                fragmentManager.beginTransaction().replace(R.id.login_layout_content, resetPasswordFragment).commit();
+                replaceFragment(new ResetPasswordFragment());
                 return true;
         }
         return false;
     };
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.login_layout_content, fragment).commit();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
