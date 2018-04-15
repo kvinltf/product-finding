@@ -23,7 +23,7 @@
         <menu>
             <item
                 android:id="@+id/nav_setting"
-                android:icon="@drawable/ic_menu_manage"
+                android:icon="@drawable/ic_settings_black_24dp"
                 android:title="@string/txt_setting" />
             <item
                 android:id="@+id/nav_logout"

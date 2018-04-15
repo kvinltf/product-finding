@@ -7,6 +7,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -116,9 +117,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void signOut() {
-        Intent i = new Intent(getApplicationContext(), LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        FirebaseAuth.getInstance().signOut();
-        startActivity(i);
-        finish();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Sign Out");
+        builder.setMessage("Confirm to Sign Out?");
+        builder.setPositiveButton("Sign Out",(dialog, which) -> {
+            Intent i = new Intent(getApplicationContext(), LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            FirebaseAuth.getInstance().signOut();
+            startActivity(i);
+            finish();
+        });
+        builder.create();
+        builder.show();
     }
 }
