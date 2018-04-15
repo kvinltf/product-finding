@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.productfinding.util.KeyboardUtil;
 import com.google.firebase.auth.FirebaseAuth;
 
 
@@ -54,6 +55,8 @@ public class ResetPasswordFragment extends Fragment {
 
         mResetBtn = mView.findViewById(R.id.reset_pass_btn_reset);
         mResetBtn.setOnClickListener(v -> {
+            Log.d(TAG, "init: Reset Button Clicked");
+            KeyboardUtil.hideSoftKeyboard(getActivity());
             resetPassword();
         });
     }

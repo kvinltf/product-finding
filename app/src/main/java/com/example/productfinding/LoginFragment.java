@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.productfinding.util.KeyboardUtil;
 import com.google.firebase.auth.FirebaseAuth;
 
 /**
@@ -61,6 +62,7 @@ public class LoginFragment extends Fragment {
 
         mLoginBtn.setOnClickListener(v -> {
             Log.d(TAG, "init: Login Button CLicked");
+            KeyboardUtil.hideSoftKeyboard(getActivity());
             loginNewUser();
         });
     }

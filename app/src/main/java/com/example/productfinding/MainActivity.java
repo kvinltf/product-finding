@@ -69,7 +69,18 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_logout:
                 signOut();
                 break;
-
+            case R.id.nav_profile:
+                Toast.makeText(getApplicationContext(), "Profile clicked", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.nav_map:
+                Toast.makeText(getApplicationContext(), "Map clicked", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.nav_history:
+                Toast.makeText(getApplicationContext(), "History clicked", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.nav_setting:
+                Toast.makeText(getApplicationContext(), "Setting clicked", Toast.LENGTH_SHORT).show();
+                break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

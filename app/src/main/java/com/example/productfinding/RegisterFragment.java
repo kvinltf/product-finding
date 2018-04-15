@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.productfinding.util.KeyboardUtil;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
@@ -62,6 +63,7 @@ public class RegisterFragment extends Fragment {
 
         registerBtn.setOnClickListener(v -> {
                     Log.d(TAG, "init: Register Button Clicked");
+            KeyboardUtil.hideSoftKeyboard(getActivity());
                     registerUser();
                 }
         );
