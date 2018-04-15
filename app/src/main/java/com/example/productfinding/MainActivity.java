@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Log.d(TAG, "onNavigationItemSelected: Select Nav Item");
+        FragmentManager fragmentManager = getSupportFragmentManager();
         switch (item.getItemId()) {
             case R.id.nav_logout:
                 signOut();
@@ -74,6 +76,8 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(getApplicationContext(), "Profile clicked", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_map:
+
+                fragmentManager.beginTransaction().replace(R.id.main_container, new MyMapFragment()).commit();
                 Toast.makeText(getApplicationContext(), "Map clicked", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_history:
@@ -120,7 +124,7 @@ public class MainActivity extends AppCompatActivity
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Sign Out");
         builder.setMessage("Confirm to Sign Out?");
-        builder.setPositiveButton("Sign Out",(dialog, which) -> {
+        builder.setPositiveButton("Sign Out", (dialog, which) -> {
             Intent i = new Intent(getApplicationContext(), LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             FirebaseAuth.getInstance().signOut();
             startActivity(i);
