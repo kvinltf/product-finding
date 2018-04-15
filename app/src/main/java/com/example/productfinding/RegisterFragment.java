@@ -116,7 +116,7 @@ public class RegisterFragment extends Fragment {
         } else if (mEmail.getText().toString().isEmpty()) {
             mEmail.setError(fieldRequiredErr);
             return false;
-        } else if (isValidEmail(mEmail.getText().toString())) {
+        } else if (!isValidEmail(mEmail.getText().toString())) {
             mEmail.setError(getString(R.string.err_wrong_email_format));
             return false;
         } else if (mPassword.getText().toString().isEmpty()) {
