@@ -3,6 +3,7 @@ package com.example.productfinding;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -81,10 +82,11 @@ public class RegisterFragment extends Fragment {
                                 Log.d(TAG, "registerUser: Success");
                                 Toast.makeText(getContext(), "Success Register", Toast.LENGTH_SHORT).show();
                                 updateDisplayName();
+                                backToLoginFragment();
 
                             } else {
                                 Log.e(TAG, "registerUser: Fail", registerTask.getException());
-                                Toast.makeText(getContext(), registerTask.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), registerTask.getException().getMessage(), Toast.LENGTH_LONG).show();
                             }
                             showProgressBar(false);
                         }
@@ -112,18 +114,23 @@ public class RegisterFragment extends Fragment {
 
         if (mName.getText().toString().isEmpty()) {
             mName.setError(fieldRequiredErr);
+            mName.requestFocus();
             return false;
         } else if (mEmail.getText().toString().isEmpty()) {
             mEmail.setError(fieldRequiredErr);
+            mEmail.requestFocus();
             return false;
         } else if (!isValidEmail(mEmail.getText().toString())) {
             mEmail.setError(getString(R.string.err_wrong_email_format));
+            mEmail.requestFocus();
             return false;
         } else if (mPassword.getText().toString().isEmpty()) {
             mEmail.setError(fieldRequiredErr);
+            mEmail.requestFocus();
             return false;
         } else if (mPassword.getText().toString().length() < 6) {
             mPassword.setError(getString(R.string.err_password_length));
+            mPassword.requestFocus();
             return false;
         }
         return true;
@@ -135,5 +142,10 @@ public class RegisterFragment extends Fragment {
 
     public final static boolean isValidEmail(CharSequence target) {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+    }
+
+    private void backToLoginFragment(){
+        BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.login_bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.bottom_navigation_login);
     }
 }
