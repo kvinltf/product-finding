@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">Product Finding</string>
+    <!--Error Text-->
+    <string name="err_field_required">This Field is Required</string>
+    <string name="err_wrong_email_format">Wrong Email Format</string>
+    <string name="err_password_length">Password Require at least 6 Character</string>
     <!--Activity Title-->
     <string name="title_activity_login">Login</string>
     <!--Bottom Navigation Text-->
