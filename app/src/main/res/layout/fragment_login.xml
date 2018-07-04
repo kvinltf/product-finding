@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -13,6 +14,17 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <ImageView
+            android:id="@+id/login_iv_logo"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/logo"
+            app:srcCompat="@drawable/app_logo" />
+
 
         <TextView
             android:id="@+id/login_tv_title"
@@ -25,6 +37,7 @@
             android:id="@+id/login_et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:drawableRight="@drawable/ic_email_black_24dp"
             android:ems="10"
             android:hint="@string/txt_email_address"
             android:inputType="textEmailAddress"
@@ -34,6 +47,7 @@
             android:id="@+id/login_et_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:drawableRight="@drawable/ic_lock_black_24dp"
             android:ems="10"
             android:hint="@string/txt_password"
             android:inputType="textPassword"
