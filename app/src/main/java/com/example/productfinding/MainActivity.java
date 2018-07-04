@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity
         initNavigationDrawerHeader();
     }
 
+
     private void init() {
         Log.d(TAG, "init: Initialize Variable");
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+//        navigationView.getMenu().getItem(1).setChecked(true);
+        onNavigationItemSelected(navigationView.getMenu().getItem(1));
     }
 
     private boolean isUserExist() {
@@ -78,7 +81,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_map:
 
                 fragmentManager.beginTransaction().replace(R.id.main_container, new MyMapFragment()).commit();
-                Toast.makeText(getApplicationContext(), "Map clicked", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "Map clicked", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_history:
                 Toast.makeText(getApplicationContext(), "History clicked", Toast.LENGTH_SHORT).show();
