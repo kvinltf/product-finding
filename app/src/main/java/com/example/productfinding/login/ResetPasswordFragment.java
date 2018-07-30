@@ -1,4 +1,4 @@
-package com.example.productfinding;
+package com.example.productfinding.login;
 
 
 import android.os.Bundle;
@@ -13,8 +13,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.productfinding.R;
 import com.example.productfinding.util.KeyboardUtil;
-import com.google.firebase.auth.FirebaseAuth;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 /**
@@ -22,7 +29,6 @@ import com.google.firebase.auth.FirebaseAuth;
  */
 public class ResetPasswordFragment extends Fragment {
     private static final String TAG = "ResetPasswordFragment";
-    private FirebaseAuth mFirebaseAuth;
     private EditText mEmail;
     private Button mResetBtn;
     private View mView;
@@ -36,7 +42,7 @@ public class ResetPasswordFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: Create Reset Password Fragment");
         super.onCreate(savedInstanceState);
-        mFirebaseAuth = FirebaseAuth.getInstance();
+
     }
 
     @Override
@@ -67,18 +73,41 @@ public class ResetPasswordFragment extends Fragment {
 
         showProgressBar(true);
 
-        mFirebaseAuth.sendPasswordResetEmail(mEmail.getText().toString())
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, "resetPassword: Success");
-                        Toast.makeText(getContext(), "Verification Email Send", Toast.LENGTH_SHORT).show();
-                        backToLoginFragment();
-                    } else {
-                        Log.e(TAG, "resetPassword: Fail", task.getException());
-                        Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+        //reset password
+        String email = mEmail.getText().toString();
+        String url = getString(R.string.url_user);
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            jsonObject.put("action", "forgetpassword");
+            jsonObject.put("email", email);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                jsonObject,
+                response -> {
+                    try {
+                        Log.d(TAG, "resetPassword: " + response.toString());
+                        Toast.makeText(getContext(), response.getString("result"), Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        Log.d(TAG, "JsonObjectRequest: JSONException " + e.getMessage());
+                        e.printStackTrace();
+                    } finally {
+                        showProgressBar(false);
                     }
+                },
+                error -> {
+                    Log.d(TAG, "JsonObjectRequest Error: " + error.getMessage());
+                    error.printStackTrace();
                     showProgressBar(false);
-                });
+                }
+        );
+        Volley.newRequestQueue(getContext()).add(jsonObjectRequest).setRetryPolicy(new DefaultRetryPolicy( 50000, 5, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
     }
 
     private boolean isEditTextFieldValid() {
@@ -105,7 +134,7 @@ public class ResetPasswordFragment extends Fragment {
         mView.findViewById(R.id.progress_bar_layout).setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
-    private void backToLoginFragment(){
+    private void backToLoginFragment() {
         BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.login_bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.bottom_navigation_login);
     }

@@ -1,6 +1,8 @@
-package com.example.productfinding;
+package com.example.productfinding.login;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,15 +14,25 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.productfinding.MainActivity;
+import com.example.productfinding.R;
+import com.example.productfinding.model.User;
 import com.example.productfinding.util.KeyboardUtil;
-import com.google.firebase.auth.FirebaseAuth;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class LoginFragment extends Fragment {
     private static final String TAG = "LoginFragment";
-    private FirebaseAuth mFirebaseAuth;
 
     private TextView mEmail;
     private TextView mPassword;
@@ -35,7 +47,6 @@ public class LoginFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: Create Login Fragment");
         super.onCreate(savedInstanceState);
-        mFirebaseAuth = FirebaseAuth.getInstance();
         if (isUserExist()) {
             processExistUser();
         }
@@ -66,24 +77,6 @@ public class LoginFragment extends Fragment {
             loginNewUser();
         });
     }
-/*
-    private void processExistUser() {
-        Log.d(TAG, "processExistUser: User Exist, Processing");
-
-        FirebaseUser currentUser = mFirebaseAuth.getCurrentUser();
-
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle("User Found");
-        alertDialog.setMessage("Do you wan to Login as: " + currentUser.getDisplayName() + "?");
-        alertDialog.setPositiveButton("Yes", (dialog, which) -> {
-            loginExistUser();
-        });
-        alertDialog.setNegativeButton("No", ((dialog, which) -> {
-            signoutExistUser();
-        }));
-        alertDialog.create();
-        alertDialog.show();
-    }*/
 
     private void processExistUser() {
         Log.d(TAG, "processExistUser: User Exist, Processing");
@@ -92,7 +85,7 @@ public class LoginFragment extends Fragment {
 
     private void signoutExistUser() {
         Log.d(TAG, "signoutExistUser: Sign Out Existing User");
-        mFirebaseAuth.signOut();
+
     }
 
     private void loginExistUser() {
@@ -105,25 +98,63 @@ public class LoginFragment extends Fragment {
 
         if (!isEditTextValid()) return;
 
-        if (isUserExist()) signoutExistUser();
+        showProgressBar(true);
+        //if (isUserExist()) signoutExistUser();
 
         String email = mEmail.getText().toString();
         String password = mPassword.getText().toString();
 
-        showProgressBar(true);
+        String url = getString(R.string.url_user);
 
-        mFirebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Log.d(TAG, "loginNewUser: Success");
-                Toast.makeText(getContext(), "Welcome, " + mFirebaseAuth.getCurrentUser().getDisplayName(), Toast.LENGTH_SHORT).show();
-                startMainActivity();
-            } else {
-                Log.e(TAG, "loginNewUser: Fail", task.getException());
-                Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                showProgressBar(false);
-            }
-        });
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("action","login");
+            jsonObject.put("email", email);
+            jsonObject.put("password", password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
+        JsonObjectRequest stringRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                jsonObject,
+                response -> {
+                    try {
+                        if (response.getString("status").equalsIgnoreCase("success")) {
+                            Log.i(TAG, "onResponse: Success Verify User");
+                            Log.d(TAG, "onResponse() called with: response = [" + response.toString() + "]");
+                            Toast.makeText(getContext(), "Success Login", Toast.LENGTH_SHORT).show();
+
+                            JSONObject userResult = response.getJSONObject("result");
+
+                            User currentUser = new User(userResult.getInt("id"), userResult.getString("name"), userResult.getString("email"), userResult.getString("password"), new java.util.Date(Timestamp.valueOf(userResult.getString("created_on")).getTime()));
+
+                            SharedPreferences sharedPreferences = getContext().getSharedPreferences(getString(R.string.share_preference_name), Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putInt("id",currentUser.getId());
+                            editor.putString("name",currentUser.getName());
+                            editor.putString("email",currentUser.getEmail());
+                            editor.putString("password",currentUser.getPassword());
+                            editor.putString("created_on",currentUser.getCreated_on().toString());
+                            editor.commit();
+
+
+                        } else if (response.getString("status").equalsIgnoreCase("fail")) {
+                            Toast.makeText(getContext(), "Wrong Email or Password, Please Try Again", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    showProgressBar(false);
+                },
+                error -> {
+                    Log.d(TAG, "onErrorResponse: " + error.getMessage());
+                    error.printStackTrace();
+                    showProgressBar(false);
+                }
+        );
+        Volley.newRequestQueue(getContext()).add(stringRequest);
     }
 
     private void showProgressBar(Boolean show) {
@@ -164,6 +195,7 @@ public class LoginFragment extends Fragment {
 
     private boolean isUserExist() {
         Log.d(TAG, "isUserExist: Check is User Exist");
-        return (mFirebaseAuth.getCurrentUser() != null) ? true : false;
+
+        return false;
     }
 }

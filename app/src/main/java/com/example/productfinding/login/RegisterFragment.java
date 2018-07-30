@@ -1,4 +1,4 @@
-package com.example.productfinding;
+package com.example.productfinding.login;
 
 
 import android.os.Bundle;
@@ -13,21 +13,25 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.productfinding.R;
 import com.example.productfinding.util.KeyboardUtil;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.UserProfileChangeRequest;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
- * A simple {@link Fragment} subclass.
+ * A {@link Fragment} subclass that register new user.
  */
 public class RegisterFragment extends Fragment {
     private static final String TAG = "RegisterFragment";
-    private FirebaseAuth mFirebaseAuth;
 
     private TextView mName;
     private TextView mEmail;
     private TextView mPassword;
+    private TextView mRePassword;
     private View mView;
     private Button registerBtn;
 
@@ -39,7 +43,6 @@ public class RegisterFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: Create Register Fragment");
         super.onCreate(savedInstanceState);
-        mFirebaseAuth = FirebaseAuth.getInstance();
     }
 
 
@@ -60,11 +63,13 @@ public class RegisterFragment extends Fragment {
         mEmail = mView.findViewById(R.id.register_et_email);
         mPassword = mView.findViewById(R.id.register_et_password);
         registerBtn = mView.findViewById(R.id.register_btn_register);
+        mRePassword = mView.findViewById(R.id.register_et_repassword);
 
         registerBtn.setOnClickListener(v -> {
                     Log.d(TAG, "init: Register Button Clicked");
-            KeyboardUtil.hideSoftKeyboard(getActivity());
-                    registerUser();
+                    KeyboardUtil.hideSoftKeyboard(getActivity());
+                    if (!isEditTextFieldValid()) return;
+                    else registerUser();
                 }
         );
     }
@@ -72,42 +77,66 @@ public class RegisterFragment extends Fragment {
     private void registerUser() {
         Log.d(TAG, "registerUser: Registering User");
 
-        if (!isEditTextFieldValid()) return;
         showProgressBar(true);
 
         String password = mPassword.getText().toString();
         String email = mEmail.getText().toString();
+        String name = mName.getText().toString();
 
-        mFirebaseAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(registerTask -> {
-                            if (registerTask.isSuccessful()) {
-                                Log.d(TAG, "registerUser: Success");
-                                Toast.makeText(getContext(), "Success Register", Toast.LENGTH_SHORT).show();
-                                updateDisplayName();
-                                backToLoginFragment();
+        String url = "http://kvinltf.me/productfinding/android/user.php";
 
-                            } else {
-                                Log.e(TAG, "registerUser: Fail", registerTask.getException());
-                                Toast.makeText(getContext(), registerTask.getException().getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                            showProgressBar(false);
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("action", "register");
+            jsonObject.put("name", name);
+            jsonObject.put("email", email);
+            jsonObject.put("password", password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest objectRequest = new JsonObjectRequest(
+                Request.Method.POST, url, jsonObject,
+                response -> {
+                    try {
+                        if (response.getString("status").equalsIgnoreCase("success")) {
+                            Toast.makeText(getContext(), "Success Register New User", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "Fail Register New User \nPlease Change Another Email Address", Toast.LENGTH_LONG).show();
                         }
-                );
+                        Log.d(TAG, "registerUser() Message-> " + response.toString());
+
+                    } catch (JSONException e) {
+                        Log.d(TAG, "registerUser: Error --> JSONExcepption");
+                        Log.d(TAG, "registerUser() returned: " + response.toString());
+                        e.printStackTrace();
+                    } finally {
+                        showProgressBar(false);
+                    }
+                },
+                error -> {
+                    Log.d(TAG, "registerUser: Error Listener-> " + error.getMessage());
+                    error.printStackTrace();
+                    showProgressBar(false);
+                }
+        );
+        Volley.newRequestQueue(getContext()).add(objectRequest);
     }
 
     private void updateDisplayName() {
         Log.d(TAG, "updateDisplayName: Update User Display Name");
         String name = mName.getText().toString();
 
-        mFirebaseAuth.getCurrentUser().updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(name).build())
-                .addOnCompleteListener(
-                        updateTask -> {
-                            if (updateTask.isSuccessful()) {
-                                Log.d(TAG, "updateDisplayName: Success Update Display Name");
-                            } else
-                                Log.e(TAG, "updateDisplayName: Fail Update Display Name", updateTask.getException());
-                        }
-                );
+        //todo: change to my custom methods
+//        mFirebaseAuth.getCurrentUser().updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(name).build())
+//                .addOnCompleteListener(
+//                        updateTask -> {
+//                            if (updateTask.isSuccessful()) {
+//                                Log.d(TAG, "updateDisplayName: Success Update Display Name");
+//                            } else
+//                                Log.e(TAG, "updateDisplayName: Fail Update Display Name", updateTask.getException());
+//                        }
+//                );
     }
 
     private boolean isEditTextFieldValid() {
@@ -134,6 +163,9 @@ public class RegisterFragment extends Fragment {
             mPassword.setError(getString(R.string.err_password_length));
             mPassword.requestFocus();
             return false;
+        } else if (!mRePassword.getText().toString().equalsIgnoreCase(mPassword.getText().toString())) {
+            mRePassword.setError(getString(R.string.err_repassword));
+            mRePassword.requestFocus();
         }
         return true;
     }
@@ -146,7 +178,7 @@ public class RegisterFragment extends Fragment {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
     }
 
-    private void backToLoginFragment(){
+    private void backToLoginFragment() {
         BottomNavigationView bottomNavigationView = getActivity().findViewById(R.id.login_bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.bottom_navigation_login);
     }

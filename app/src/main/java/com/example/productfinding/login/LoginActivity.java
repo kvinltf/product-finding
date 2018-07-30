@@ -1,4 +1,4 @@
-package com.example.productfinding;
+package com.example.productfinding.login;
 
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
@@ -6,8 +6,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
-public class LoginActivity extends AppCompatActivity {
+import com.example.productfinding.R;
 
+public class LoginActivity extends AppCompatActivity {
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
