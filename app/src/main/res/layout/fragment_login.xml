@@ -37,7 +37,7 @@
             android:id="@+id/login_et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableRight="@drawable/ic_email_black_24dp"
+            android:drawableEnd="@drawable/ic_email_black_24dp"
             android:ems="10"
             android:hint="@string/txt_email_address"
             android:inputType="textEmailAddress"
@@ -47,11 +47,17 @@
             android:id="@+id/login_et_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableRight="@drawable/ic_lock_black_24dp"
+            android:drawableEnd="@drawable/ic_lock_black_24dp"
             android:ems="10"
             android:hint="@string/txt_password"
             android:inputType="textPassword"
             android:singleLine="true" />
+
+        <CheckBox
+            android:id="@+id/login_cb_remember_me"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/remember_me" />
 
         <Button
             android:id="@+id/login_btn_login"

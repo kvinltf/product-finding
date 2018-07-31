@@ -18,6 +18,7 @@ import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.productfinding.R;
+import com.example.productfinding.util.EmailUtil;
 import com.example.productfinding.util.KeyboardUtil;
 
 import org.json.JSONException;
@@ -29,10 +30,10 @@ import org.json.JSONObject;
  */
 public class ResetPasswordFragment extends Fragment {
     private static final String TAG = "ResetPasswordFragment";
+
     private EditText mEmail;
     private Button mResetBtn;
     private View mView;
-
 
     public ResetPasswordFragment() {
         // Required empty public constructor
@@ -42,7 +43,6 @@ public class ResetPasswordFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: Create Reset Password Fragment");
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -50,18 +50,17 @@ public class ResetPasswordFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_reset_password, container, false);
-        init();
+        initializeParameter();
         return mView;
     }
 
-    private void init() {
-        Log.d(TAG, "init: Initialize Variable");
+    private void initializeParameter() {
+        Log.d(TAG, "initializeParameter: Initialize Variable");
 
         mEmail = mView.findViewById(R.id.reset_pass_et_email);
-
         mResetBtn = mView.findViewById(R.id.reset_pass_btn_reset);
-        mResetBtn.setOnClickListener(v -> {
-            Log.d(TAG, "init: Reset Button Clicked");
+        mResetBtn.setOnClickListener((View v) -> {
+            Log.d(TAG, "initializeParameter: Reset Button Clicked");
             KeyboardUtil.hideSoftKeyboard(getActivity());
             resetPassword();
         });
@@ -69,7 +68,7 @@ public class ResetPasswordFragment extends Fragment {
 
     private void resetPassword() {
         Log.d(TAG, "resetPassword: Resetting Password");
-        if (!isEditTextFieldValid()) return;
+        if (!isInputValid()) return;
 
         showProgressBar(true);
 
@@ -91,8 +90,13 @@ public class ResetPasswordFragment extends Fragment {
                 jsonObject,
                 response -> {
                     try {
+
                         Log.d(TAG, "resetPassword: " + response.toString());
                         Toast.makeText(getContext(), response.getString("result"), Toast.LENGTH_LONG).show();
+
+                        if (response.getString("status").equalsIgnoreCase("success")) {
+                            backToLoginFragment();
+                        }
                     } catch (JSONException e) {
                         Log.d(TAG, "JsonObjectRequest: JSONException " + e.getMessage());
                         e.printStackTrace();
@@ -106,28 +110,24 @@ public class ResetPasswordFragment extends Fragment {
                     showProgressBar(false);
                 }
         );
-        Volley.newRequestQueue(getContext()).add(jsonObjectRequest).setRetryPolicy(new DefaultRetryPolicy( 50000, 5, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        Volley.newRequestQueue(getContext()).add(jsonObjectRequest).setRetryPolicy(new DefaultRetryPolicy(50000, 5, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
     }
 
-    private boolean isEditTextFieldValid() {
-        Log.d(TAG, "isEditTextFieldValid: Check is Edit Text Field Valid");
+    private boolean isInputValid() {
+        Log.d(TAG, "isInputValid: Checking The User's Input Validity");
         String fieldRequiredErr = getString(R.string.err_field_required);
 
         if (mEmail.getText().toString().isEmpty()) {
             mEmail.setError(fieldRequiredErr);
             mEmail.requestFocus();
             return false;
-        } else if (!isValidEmail(mEmail.getText().toString())) {
+        } else if (!EmailUtil.isValidEmail(mEmail.getText().toString())) {
             mEmail.setError(getString(R.string.err_wrong_email_format));
             mEmail.requestFocus();
             return false;
-        }
-        return true;
-    }
-
-    public final static boolean isValidEmail(CharSequence target) {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        } else
+            return true;
     }
 
     private void showProgressBar(Boolean show) {

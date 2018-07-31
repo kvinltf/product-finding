@@ -41,9 +41,11 @@
     <string name="search_hint">Search...</string>
     <string name="logo">logo</string>
 
-
-    <string name="share_preference_name">MySharedPreference</string>
+    <!--share preference-->
+    <string name="share_preference_current_user">UserSharedPreference</string>
 
     <!--URL-->
     <string name="url_user">http://kvinltf.me/productfinding/android/user.php</string>
+    <string name="remember_me">Remember Me</string>
+    <string name="retype_the_password">Retype the password</string>
 </resources>

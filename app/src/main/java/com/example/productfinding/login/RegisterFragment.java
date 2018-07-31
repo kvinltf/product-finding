@@ -17,6 +17,7 @@ import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.productfinding.R;
+import com.example.productfinding.util.EmailUtil;
 import com.example.productfinding.util.KeyboardUtil;
 
 import org.json.JSONException;
@@ -45,7 +46,6 @@ public class RegisterFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -53,22 +53,27 @@ public class RegisterFragment extends Fragment {
 
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_register, container, false);
-        init();
+        initializeParameter();
         return mView;
     }
 
-    private void init() {
-        Log.d(TAG, "init: Initializing Value");
+    /**
+     * Initialize Login Fragment's Variable and
+     * <p>set Listener to Button</p>
+     */
+    private void initializeParameter() {
+        Log.d(TAG, "initializeParameter: Initializing Variable");
+
         mName = mView.findViewById(R.id.register_et_name);
         mEmail = mView.findViewById(R.id.register_et_email);
         mPassword = mView.findViewById(R.id.register_et_password);
         registerBtn = mView.findViewById(R.id.register_btn_register);
         mRePassword = mView.findViewById(R.id.register_et_repassword);
 
-        registerBtn.setOnClickListener(v -> {
-                    Log.d(TAG, "init: Register Button Clicked");
+        registerBtn.setOnClickListener((View v) -> {
+                    Log.d(TAG, "initializeParameter: Register Button Clicked");
                     KeyboardUtil.hideSoftKeyboard(getActivity());
-                    if (!isEditTextFieldValid()) return;
+                    if (!isInputValid()) return;
                     else registerUser();
                 }
         );
@@ -82,33 +87,41 @@ public class RegisterFragment extends Fragment {
         String password = mPassword.getText().toString();
         String email = mEmail.getText().toString();
         String name = mName.getText().toString();
-
-        String url = "http://kvinltf.me/productfinding/android/user.php";
-
+        String url = getString(R.string.url_user);
         JSONObject jsonObject = new JSONObject();
+
         try {
             jsonObject.put("action", "register");
             jsonObject.put("name", name);
             jsonObject.put("email", email);
             jsonObject.put("password", password);
         } catch (JSONException e) {
+            Log.d(TAG, "registerUser: JSONException " + e.getMessage());
             e.printStackTrace();
         }
 
-        JsonObjectRequest objectRequest = new JsonObjectRequest(
-                Request.Method.POST, url, jsonObject,
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                jsonObject,
                 response -> {
                     try {
+                        //Request SUCCESS
                         if (response.getString("status").equalsIgnoreCase("success")) {
                             Toast.makeText(getContext(), "Success Register New User", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getContext(), "Fail Register New User \nPlease Change Another Email Address", Toast.LENGTH_LONG).show();
+                            backToLoginFragment();
+                        }
+                        //Request FAIL
+                        else {
+                            Toast.makeText(
+                                    getContext(),
+                                    "Fail Register New User \nPlease Change Another Email Address",
+                                    Toast.LENGTH_LONG).show();
                         }
                         Log.d(TAG, "registerUser() Message-> " + response.toString());
 
                     } catch (JSONException e) {
-                        Log.d(TAG, "registerUser: Error --> JSONExcepption");
-                        Log.d(TAG, "registerUser() returned: " + response.toString());
+                        Log.d(TAG, "registerUser: Error --> JSONException: " + e.getMessage());
                         e.printStackTrace();
                     } finally {
                         showProgressBar(false);
@@ -120,7 +133,7 @@ public class RegisterFragment extends Fragment {
                     showProgressBar(false);
                 }
         );
-        Volley.newRequestQueue(getContext()).add(objectRequest);
+        Volley.newRequestQueue(getContext()).add(jsonObjectRequest);
     }
 
     private void updateDisplayName() {
@@ -139,8 +152,8 @@ public class RegisterFragment extends Fragment {
 //                );
     }
 
-    private boolean isEditTextFieldValid() {
-        Log.d(TAG, "isEditTextFieldValid: Check is Edit Text Field Valid");
+    private boolean isInputValid() {
+        Log.d(TAG, "isInputValid: Checking The User's Input Validity");
         String fieldRequiredErr = getString(R.string.err_field_required);
 
         if (mName.getText().toString().isEmpty()) {
@@ -151,7 +164,7 @@ public class RegisterFragment extends Fragment {
             mEmail.setError(fieldRequiredErr);
             mEmail.requestFocus();
             return false;
-        } else if (!isValidEmail(mEmail.getText().toString())) {
+        } else if (!EmailUtil.isValidEmail(mEmail.getText().toString())) {
             mEmail.setError(getString(R.string.err_wrong_email_format));
             mEmail.requestFocus();
             return false;
@@ -172,10 +185,6 @@ public class RegisterFragment extends Fragment {
 
     private void showProgressBar(Boolean show) {
         mView.findViewById(R.id.progress_bar_layout).setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
-    public final static boolean isValidEmail(CharSequence target) {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
     }
 
     private void backToLoginFragment() {

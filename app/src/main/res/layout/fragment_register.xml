@@ -24,7 +24,7 @@
             android:id="@+id/register_et_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableRight="@drawable/ic_person_black_24dp"
+            android:drawableEnd="@drawable/ic_person_black_24dp"
             android:ems="10"
             android:hint="@string/txt_name"
             android:inputType="textPersonName" />
@@ -33,7 +33,7 @@
             android:id="@+id/register_et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableRight="@drawable/ic_email_black_24dp"
+            android:drawableEnd="@drawable/ic_email_black_24dp"
             android:ems="10"
             android:hint="@string/txt_email_address"
             android:inputType="textEmailAddress"
@@ -43,7 +43,7 @@
             android:id="@+id/register_et_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableRight="@drawable/ic_lock_black_24dp"
+            android:drawableEnd="@drawable/ic_lock_black_24dp"
             android:ems="10"
             android:hint="@string/txt_password"
             android:inputType="textPassword"
@@ -53,9 +53,9 @@
             android:id="@+id/register_et_repassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableRight="@drawable/ic_lock_black_24dp"
+            android:drawableEnd="@drawable/ic_lock_black_24dp"
             android:ems="10"
-            android:hint="Retype the password"
+            android:hint="@string/retype_the_password"
             android:inputType="textPassword"
             android:singleLine="true" />
 
