@@ -8,9 +8,9 @@ public class User implements Serializable {
     private String name;
     private String email;
     private String password;
-    private java.util.Date created_on;
+    private String created_on;
 
-    public User(int id, String name, String email, String password, Date created_on) {
+    public User(int id, String name, String email, String password, String created_on) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -49,7 +49,7 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public Date getCreated_on() {
+    public String getCreated_on() {
         return created_on;
     }
 

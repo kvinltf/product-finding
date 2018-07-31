@@ -27,8 +27,6 @@ import com.example.productfinding.util.KeyboardUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.sql.Timestamp;
-
 /**
  * A simple {@link Fragment} subclass that login user.
  */
@@ -131,7 +129,7 @@ public class LoginFragment extends Fragment {
                                     userResult.getString("name"),
                                     userResult.getString("email"),
                                     userResult.getString("password"),
-                                    new java.util.Date(Timestamp.valueOf(userResult.getString("created_on")).getTime())
+                                    userResult.getString("created_on")
                             );
 
 
@@ -174,11 +172,11 @@ public class LoginFragment extends Fragment {
         String name = sharedPreferences.getString("name", "UNKNOWN");
         String email = sharedPreferences.getString("email", "UNKNOW@UNKNOW.com");
         String password = sharedPreferences.getString("password", "UNKNOW");
-        String created_on = sharedPreferences.getString("created_on", "Sat Jul 21 14:37:03 GMT+00:00 2018");
+        String created_on = sharedPreferences.getString("created_on", "2018-07-21 14:37:03");
 
-        User newUser = new User(id, name, email, password, new java.util.Date(Timestamp.valueOf(created_on).getTime()));
-
+        User newUser = new User(id, name, email, password, created_on);
         startMainActivity(newUser);
+
     }
 
     private void signoutExistUser() {
