@@ -59,11 +59,12 @@ public class LoginFragment extends Fragment {
         mView = inflater.inflate(R.layout.fragment_login, container, false);
 
         initializeParameter();
-
         //check is user logged in? else Proceed to Login Process
         if (isUserExist()) {
+            Toast.makeText(getContext(), "Logging In...Please Wait", Toast.LENGTH_SHORT).show();
             processExistUser();
         }
+
         return mView;
     }
 
@@ -73,13 +74,12 @@ public class LoginFragment extends Fragment {
      */
     private void initializeParameter() {
         Log.d(TAG, "initializeParameter: Initializing Variable");
-
         mEmail = mView.findViewById(R.id.login_et_email);
         mPassword = mView.findViewById(R.id.login_et_password);
         mLoginBtn = mView.findViewById(R.id.login_btn_login);
         mRememberMeCb = mView.findViewById(R.id.login_cb_remember_me);
-        sharedPreferences = getContext().getSharedPreferences(getString(R.string.share_preference_current_user), Context.MODE_PRIVATE);
 
+        sharedPreferences = getContext().getSharedPreferences(getString(R.string.share_preference_current_user), Context.MODE_PRIVATE);
 
         mLoginBtn.setOnClickListener((View v) -> {
             Log.d(TAG, "Login Button CLicked");
@@ -121,7 +121,6 @@ public class LoginFragment extends Fragment {
                         if (response.getString("status").equalsIgnoreCase("success")) {
                             Log.i(TAG, "onResponse: Success Verify User");
                             Log.d(TAG, "onResponse() called with: response = [" + response.toString() + "]");
-                            Toast.makeText(getContext(), "Success Login", Toast.LENGTH_SHORT).show();
 
                             JSONObject userResult = response.getJSONObject("result");
                             User currentUser = new User(
@@ -131,7 +130,6 @@ public class LoginFragment extends Fragment {
                                     userResult.getString("password"),
                                     userResult.getString("created_on")
                             );
-
 
                             if (mRememberMeCb.isChecked()) {
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -147,13 +145,13 @@ public class LoginFragment extends Fragment {
                         //Request FAIL
                         else if (response.getString("status").equalsIgnoreCase("fail")) {
                             Toast.makeText(getContext(), "Wrong Email or Password, Please Try Again", Toast.LENGTH_SHORT).show();
+                            showProgressBar(false);
                         }
                     }
                     //Something Error Happen
                     catch (JSONException e) {
                         Log.d(TAG, "userLogin: Error --> JSONException: " + e.getMessage());
                         e.printStackTrace();
-                    } finally {
                         showProgressBar(false);
                     }
                 },
@@ -174,14 +172,8 @@ public class LoginFragment extends Fragment {
         String password = sharedPreferences.getString("password", "UNKNOW");
         String created_on = sharedPreferences.getString("created_on", "2018-07-21 14:37:03");
 
-        User newUser = new User(id, name, email, password, created_on);
-        startMainActivity(newUser);
+        startMainActivity(new User(id, name, email, password, created_on));
 
-    }
-
-    private void signoutExistUser() {
-        Log.d(TAG, "signoutExistUser: Sign Out Existing User");
-        sharedPreferences.edit().clear().commit();
     }
 
     /**
