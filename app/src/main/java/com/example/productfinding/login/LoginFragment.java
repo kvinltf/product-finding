@@ -144,6 +144,7 @@ public class LoginFragment extends Fragment {
                                 editor.putString("created_on", currentUser.getCreated_on().toString());
                                 editor.commit();
                             }
+                            startMainActivity(currentUser);
                         }
                         //Request FAIL
                         else if (response.getString("status").equalsIgnoreCase("fail")) {
@@ -169,19 +170,21 @@ public class LoginFragment extends Fragment {
 
     private void processExistUser() {
         Log.d(TAG, "processExistUser: User Exist, Processing");
-        loginExistUser();
+        int id = sharedPreferences.getInt("id", 1);
+        String name = sharedPreferences.getString("name", "UNKNOWN");
+        String email = sharedPreferences.getString("email", "UNKNOW@UNKNOW.com");
+        String password = sharedPreferences.getString("password", "UNKNOW");
+        String created_on = sharedPreferences.getString("created_on", "Sat Jul 21 14:37:03 GMT+00:00 2018");
+
+        User newUser = new User(id, name, email, password, new java.util.Date(Timestamp.valueOf(created_on).getTime()));
+
+        startMainActivity(newUser);
     }
 
     private void signoutExistUser() {
         Log.d(TAG, "signoutExistUser: Sign Out Existing User");
         sharedPreferences.edit().clear().commit();
     }
-
-    private void loginExistUser() {
-        Log.d(TAG, "loginExistUser: Login with Exist User");
-        startMainActivity();
-    }
-
 
     /**
      * @return <ul>
@@ -211,9 +214,12 @@ public class LoginFragment extends Fragment {
             return true;
     }
 
-    private void startMainActivity() {
+    private void startMainActivity(User user) {
         Log.d(TAG, "startMainActivity: Start Activity");
-        startActivity(new Intent(getContext(), MainActivity.class));
+        Intent i = new Intent(getContext(), MainActivity.class);
+        i.putExtra("loginUser", user);
+        startActivity(i);
+
         getActivity().finish();
     }
 
