@@ -1,7 +1,7 @@
 package com.example.productfinding.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.List;
 
 public class User implements Serializable {
     private int id;
@@ -9,6 +9,16 @@ public class User implements Serializable {
     private String email;
     private String password;
     private String created_on;
+    private List<Shop> shopList;
+
+    public User(int id, String name, String email, String password, String created_on, List<Shop> shopList) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.created_on = created_on;
+        this.shopList = shopList;
+    }
 
     public User(int id, String name, String email, String password, String created_on) {
         this.id = id;
@@ -23,6 +33,10 @@ public class User implements Serializable {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -53,6 +67,19 @@ public class User implements Serializable {
         return created_on;
     }
 
+    public void setCreated_on(String created_on) {
+        this.created_on = created_on;
+    }
+
+
+    public List<Shop> getShopList() {
+        return shopList;
+    }
+
+    public void setShopList(List<Shop> shopList) {
+        this.shopList = shopList;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -60,7 +87,8 @@ public class User implements Serializable {
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", created_on=" + created_on +
+                ", created_on='" + created_on + '\'' +
+                ", shopList=" + shopList +
                 '}';
     }
 }
