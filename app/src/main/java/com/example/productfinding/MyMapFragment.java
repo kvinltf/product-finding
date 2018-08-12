@@ -77,26 +77,26 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback, Activ
 
             List<MarkerOptions> markerOptionsList = new ArrayList<>();
 
-            MarkerOptions tescoKamparMarker = new MarkerOptions().position(new LatLng(4.3353572, 101.1538988)).title("Tesco Kampar");
-            MarkerOptions econsaveTaipingMarker = new MarkerOptions().position(new LatLng(4.8915194, 100.7309496)).title("Econsave Taiping");
-            MarkerOptions econsaveKamaprMarker = new MarkerOptions().position(new LatLng(4.327343, 101.146956)).title("Econsave Kampar");
-            MarkerOptions gaintKamparMarker = new MarkerOptions().position(new LatLng(4.342949, 101.154668)).title("Gaint Kampar");
-            MarkerOptions sevenElevenKamparMarker = new MarkerOptions().position(new LatLng(4.326428, 101.143390)).title("7-eleven Kampar");
-
-            markerOptionsList.add(tescoKamparMarker);
-            markerOptionsList.add(econsaveTaipingMarker);
-            markerOptionsList.add(econsaveKamaprMarker);
-            markerOptionsList.add(gaintKamparMarker);
-            markerOptionsList.add(sevenElevenKamparMarker);
-            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.310732, 101.151670)).title("PASARAYA ECON KAMPAR"));
-            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.327045,101.145238)).title("Paris Mini Baker"));
-            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.309903,101.153329)).title("Butik Binari"));
-            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.310185,101.152100)).title("mmCineplexes Kampar"));
-            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.073788,101.157545)).title("K. Muthalagu Chettiar Enterprise"));
-            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.595913,101.090094)).title("Ipoh Parade"));
-            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.594878,101.085817)).title("Expressway Service Tires"));
-            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.595989,101.077307)).title("Funtasy House Trick Art"));
-            markerOptionsList.add(new MarkerOptions().position(new LatLng(3.161801,101.570630)).title(" Glass & Plastic Packaging Sdn Bhd"));
+//            MarkerOptions tescoKamparMarker = new MarkerOptions().position(new LatLng(4.3353572, 101.1538988)).title("Tesco Kampar");
+//            MarkerOptions econsaveTaipingMarker = new MarkerOptions().position(new LatLng(4.8915194, 100.7309496)).title("Econsave Taiping");
+//            MarkerOptions econsaveKamaprMarker = new MarkerOptions().position(new LatLng(4.327343, 101.146956)).title("Econsave Kampar");
+//            MarkerOptions gaintKamparMarker = new MarkerOptions().position(new LatLng(4.342949, 101.154668)).title("Gaint Kampar");
+//            MarkerOptions sevenElevenKamparMarker = new MarkerOptions().position(new LatLng(4.326428, 101.143390)).title("7-eleven Kampar");
+//
+//            markerOptionsList.add(tescoKamparMarker);
+//            markerOptionsList.add(econsaveTaipingMarker);
+//            markerOptionsList.add(econsaveKamaprMarker);
+//            markerOptionsList.add(gaintKamparMarker);
+//            markerOptionsList.add(sevenElevenKamparMarker);
+//            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.310732, 101.151670)).title("PASARAYA ECON KAMPAR"));
+//            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.327045,101.145238)).title("Paris Mini Baker"));
+//            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.309903,101.153329)).title("Butik Binari"));
+//            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.310185,101.152100)).title("mmCineplexes Kampar"));
+//            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.073788,101.157545)).title("K. Muthalagu Chettiar Enterprise"));
+//            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.595913,101.090094)).title("Ipoh Parade"));
+//            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.594878,101.085817)).title("Expressway Service Tires"));
+//            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.595989,101.077307)).title("Funtasy House Trick Art"));
+//            markerOptionsList.add(new MarkerOptions().position(new LatLng(3.161801,101.570630)).title(" Glass & Plastic Packaging Sdn Bhd"));
 
             Button btn = mView.findViewById(R.id.map_btn_search);
             EditText editText = mView.findViewById(R.id.map_et_query);

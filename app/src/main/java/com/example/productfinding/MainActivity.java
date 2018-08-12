@@ -2,25 +2,44 @@ package com.example.productfinding;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.productfinding.adapter.ResutltRecycleViewAdapter;
 import com.example.productfinding.login.LoginActivity;
+import com.example.productfinding.model.Shop;
 import com.example.productfinding.model.User;
+import com.example.productfinding.util.IntentUtil;
+import com.example.productfinding.util.KeyboardUtil;
+import com.example.productfinding.util.LocationUtil;
+import com.example.productfinding.util.ResultListUtil;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -28,13 +47,13 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
 
     private DrawerLayout mDrawerLayout;
-    //    private Toolbar toolbar;
-    private ActionBar actionBar;
-    private User loginUser;
-    private NavigationView navigationView;
-    private ImageView drawerToggle;
-    private ImageView mSearchButton;
-    private EditText mSearchEt;
+    private User mLoginUser;
+    private NavigationView mNavigationView;
+    private ImageView mDrawerToggle, mSearchButton;
+    private EditText mUserSearchText;
+    private TextView mSearchResult;
+    private List<Shop> mShopList = new ArrayList<>();
+    private Location mCurrentLocation;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,33 +61,105 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         initializeParameter();
+
         initNavigationDrawerHeader();
+
+//Debug, show shoplist without click search button
+//        getShopList();
     }
 
+    private void initializeRecycleView() {
+        //RECYCLE VIEW THINGS
+        RecyclerView mRecyclerView = findViewById(R.id.search_result_recycle_view);
+        mRecyclerView.setHasFixedSize(true);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        getCurrentLocation();
+
+        ResultListUtil.sortShopListResultBy(mShopList, mCurrentLocation, ResultListUtil.ACCENDING);
+
+        RecyclerView.Adapter mAdapter = new ResutltRecycleViewAdapter(mShopList, mCurrentLocation);
+
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
+
     private void initializeParameter() {
-//        toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-
-//        actionBar = getSupportActionBar();
-//        actionBar.setDisplayHomeAsUpEnabled(true);
-//        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
-
         mDrawerLayout = findViewById(R.id.drawer_layout);
 
-        navigationView = findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        mNavigationView = findViewById(R.id.navigation_view);
+        mNavigationView.setNavigationItemSelectedListener(this);
 
-        mSearchEt = findViewById(R.id.search_et_search_item);
+        mUserSearchText = findViewById(R.id.search_et_search_item);
+        mUserSearchText.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                mSearchButton.performClick();
+                return true;
+            }
+            return false;
+        });
 
-        drawerToggle = findViewById(R.id.search_iv_drawer_toggle);
-        drawerToggle.setOnClickListener(v -> mDrawerLayout.openDrawer(GravityCompat.START));
+
+        mDrawerToggle = findViewById(R.id.search_iv_drawer_toggle);
+        mDrawerToggle.setOnClickListener(v -> mDrawerLayout.openDrawer(GravityCompat.START));
+
+        mSearchResult = findViewById(R.id.search_tv_search_result);
 
         mSearchButton = findViewById(R.id.search_iv_search_button);
         mSearchButton.setOnClickListener((View v) -> {
-            Toast.makeText(this, "Search: " + mSearchEt.getText().toString(), Toast.LENGTH_SHORT).show();
+            mSearchResult.setText(mUserSearchText.getText().toString());
+            KeyboardUtil.hideSoftKeyboard(this);
+            getShopList();
         });
 
-        loginUser = (User) getIntent().getSerializableExtra("loginUser");
+        mLoginUser = IntentUtil.getLoginUserFromIntent(getIntent());
+    }
+
+    private void getShopList() {
+        Log.d(TAG, "getShopList: Executing");
+        String url = getString(R.string.url_shop);
+
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            jsonObject.put("action", "fetchall");
+        } catch (JSONException e) {
+            Log.w(TAG, "getShopList: Error while putting jsonObject:", e.getCause());
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.POST, url, jsonObject,
+                (JSONObject response) -> {
+                    try {
+                        if (response.getString("status").equalsIgnoreCase("success")) {
+                            Log.d(TAG, "getShopList: Success");
+                            JSONObject list = response.getJSONObject("result");
+//                            Log.d(TAG, "getShopList: RESULT \n" + response.getJSONObject("result"));
+                            for (int i = 0; i < list.length(); i++) {
+                                Shop shop = new Shop(
+                                        list.getJSONObject(String.valueOf(i)).getInt("id"),
+                                        list.getJSONObject(String.valueOf(i)).getString("name"),
+                                        list.getJSONObject(String.valueOf(i)).getDouble("lat"),
+                                        list.getJSONObject(String.valueOf(i)).getDouble("lng"),
+                                        list.getJSONObject(String.valueOf(i)).getString("description"),
+                                        list.getJSONObject(String.valueOf(i)).getString("created_on")
+                                );
+//                                Log.d(TAG, "getShopList: SHOP: " + shop.toString());
+                                mShopList.add(shop);
+                            }
+                            initializeRecycleView();
+
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                (VolleyError error) -> {
+                    error.printStackTrace();
+                }
+        );
+        Volley.newRequestQueue(getApplicationContext()).add(jsonObjectRequest);
     }
 
     @Override
@@ -128,14 +219,14 @@ public class MainActivity extends AppCompatActivity
     private void initNavigationDrawerHeader() {
         Log.d(TAG, "initNavigationDrawer: Initialize Navigation Drawer Header");
 
-        View headerView = navigationView.inflateHeaderView(R.layout.navigation_drawer_header);
+        View headerView = mNavigationView.inflateHeaderView(R.layout.navigation_drawer_header);
 
         TextView userDisplayName = headerView.findViewById(R.id.nav_header_tv_name);
-        String _name = loginUser.getName();
+        String _name = mLoginUser.getName();
         userDisplayName.setText(_name);
 
         TextView userEmail = headerView.findViewById(R.id.nav_header_tv_email);
-        String _email = loginUser.getEmail();
+        String _email = mLoginUser.getEmail();
         userEmail.setText(_email);
     }
 
@@ -169,6 +260,12 @@ public class MainActivity extends AppCompatActivity
         });
         builder.create();
         builder.show();
+    }
+
+
+    private void getCurrentLocation() {
+        LocationUtil locationUtil = new LocationUtil(this, getApplicationContext());
+        mCurrentLocation = locationUtil.getMyCurrentLocation();
     }
 
 

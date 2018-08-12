@@ -22,6 +22,7 @@ import com.example.productfinding.MainActivity;
 import com.example.productfinding.R;
 import com.example.productfinding.model.User;
 import com.example.productfinding.util.EmailUtil;
+import com.example.productfinding.util.IntentUtil;
 import com.example.productfinding.util.KeyboardUtil;
 
 import org.json.JSONException;
@@ -207,7 +208,7 @@ public class LoginFragment extends Fragment {
     private void startMainActivity(User user) {
         Log.d(TAG, "startMainActivity: Start Activity");
         Intent i = new Intent(getContext(), MainActivity.class);
-        i.putExtra("loginUser", user);
+        IntentUtil.setLoginUserForIntent(i, user);
         startActivity(i);
 
         getActivity().finish();

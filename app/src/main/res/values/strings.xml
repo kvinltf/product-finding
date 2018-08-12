@@ -46,6 +46,7 @@
 
     <!--URL-->
     <string name="url_user">http://kvinltf.me/productfinding/android/user.php</string>
+    <string name="url_shop">http://kvinltf.me/productfinding/android/shop.php</string>
     <string name="remember_me">Remember Me</string>
     <string name="retype_the_password">Retype the password</string>
 </resources>
