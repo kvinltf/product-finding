@@ -6,11 +6,13 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,18 +28,22 @@ import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.productfinding.adapter.ResutltRecycleViewAdapter;
+import com.example.productfinding.adapter.ResultRecycleViewAdapter;
 import com.example.productfinding.login.LoginActivity;
-import com.example.productfinding.model.Shop;
+import com.example.productfinding.model.Catalog;
 import com.example.productfinding.model.User;
 import com.example.productfinding.util.IntentUtil;
 import com.example.productfinding.util.KeyboardUtil;
 import com.example.productfinding.util.LocationUtil;
 import com.example.productfinding.util.ResultListUtil;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,8 +58,14 @@ public class MainActivity extends AppCompatActivity
     private ImageView mDrawerToggle, mSearchButton;
     private EditText mUserSearchText;
     private TextView mSearchResult;
-    private List<Shop> mShopList = new ArrayList<>();
+    private List<Catalog> mCatalogList;
     private Location mCurrentLocation;
+
+    //recycle view things
+    private RecyclerView.Adapter mRecycleAdapter;
+    private RecyclerView mRecyclerView;
+    private RecyclerView.LayoutManager mLayoutManager;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,33 +73,28 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         initializeParameter();
-
+        initializeRecycleView();
         initNavigationDrawerHeader();
-
-//Debug, show shoplist without click search button
-//        getShopList();
     }
 
     private void initializeRecycleView() {
         //RECYCLE VIEW THINGS
-        RecyclerView mRecyclerView = findViewById(R.id.search_result_recycle_view);
+
+        mRecyclerView = findViewById(R.id.search_result_recycle_view);
         mRecyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+
+        mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-
         getCurrentLocation();
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL));
 
-        ResultListUtil.sortShopListResultBy(mShopList, mCurrentLocation, ResultListUtil.ACCENDING);
-
-        RecyclerView.Adapter mAdapter = new ResutltRecycleViewAdapter(mShopList, mCurrentLocation);
-
-        mRecyclerView.setAdapter(mAdapter);
+        mRecycleAdapter = new ResultRecycleViewAdapter(mCatalogList, mCurrentLocation);
+        mRecyclerView.setAdapter(mRecycleAdapter);
     }
-
 
     private void initializeParameter() {
         mDrawerLayout = findViewById(R.id.drawer_layout);
-
+        mCatalogList = new ArrayList<>();
         mNavigationView = findViewById(R.id.navigation_view);
         mNavigationView.setNavigationItemSelectedListener(this);
 
@@ -108,24 +115,33 @@ public class MainActivity extends AppCompatActivity
 
         mSearchButton = findViewById(R.id.search_iv_search_button);
         mSearchButton.setOnClickListener((View v) -> {
-            mSearchResult.setText(mUserSearchText.getText().toString());
-            KeyboardUtil.hideSoftKeyboard(this);
-            getShopList();
+
+            if (mUserSearchText.getText().toString().trim().isEmpty()) {
+                Toast.makeText(this, "You do not type anything inside :(", Toast.LENGTH_LONG).show();
+                mUserSearchText.setText("");
+            } else {
+                clearRecycleView();
+                mSearchResult.setText(mUserSearchText.getText().toString());
+                KeyboardUtil.hideSoftKeyboard(this);
+                getCatalogList(mUserSearchText.getText().toString());
+            }
         });
 
         mLoginUser = IntentUtil.getLoginUserFromIntent(getIntent());
     }
 
-    private void getShopList() {
-        Log.d(TAG, "getShopList: Executing");
-        String url = getString(R.string.url_shop);
+    private void getCatalogList(String userSearch) {
+        Log.d(TAG, "getCatalogList: Executing");
+        String url = getString(R.string.url_catalog);
+        mCatalogList.clear();
 
         JSONObject jsonObject = new JSONObject();
 
         try {
-            jsonObject.put("action", "fetchall");
+            jsonObject.put("action", "searchall");
+            jsonObject.put("user_search", userSearch);
         } catch (JSONException e) {
-            Log.w(TAG, "getShopList: Error while putting jsonObject:", e.getCause());
+            Log.w(TAG, "getCatalogList: Error while putting jsonObject:", e.getCause());
             e.printStackTrace();
         }
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
@@ -133,25 +149,30 @@ public class MainActivity extends AppCompatActivity
                 (JSONObject response) -> {
                     try {
                         if (response.getString("status").equalsIgnoreCase("success")) {
-                            Log.d(TAG, "getShopList: Success");
-                            JSONObject list = response.getJSONObject("result");
-//                            Log.d(TAG, "getShopList: RESULT \n" + response.getJSONObject("result"));
-                            for (int i = 0; i < list.length(); i++) {
-                                Shop shop = new Shop(
-                                        list.getJSONObject(String.valueOf(i)).getInt("id"),
-                                        list.getJSONObject(String.valueOf(i)).getString("name"),
-                                        list.getJSONObject(String.valueOf(i)).getDouble("lat"),
-                                        list.getJSONObject(String.valueOf(i)).getDouble("lng"),
-                                        list.getJSONObject(String.valueOf(i)).getString("description"),
-                                        list.getJSONObject(String.valueOf(i)).getString("created_on")
-                                );
-//                                Log.d(TAG, "getShopList: SHOP: " + shop.toString());
-                                mShopList.add(shop);
-                            }
-                            initializeRecycleView();
+                            Log.d(TAG, "getCatalogList: Success");
 
+                            ObjectMapper objectMapper = new ObjectMapper();
+                            if (!response.isNull("result")) {
+                                JSONObject resultList = response.getJSONObject("result");
+
+                                for (int i = 0; i < resultList.length(); i++) {
+                                    JSONObject catalogJsonObject = resultList.getJSONObject(String.valueOf(i));
+                                    Catalog catalog = objectMapper.readValue(catalogJsonObject.toString(), Catalog.class);
+//                                Log.d(TAG, "Catalog after Object Mapper: "+catalog.toString());
+
+                                    mCatalogList.add(catalog);
+//                                Log.d(TAG, "getCatalogList: Catalog To String:\n"+mCatalogList.toString());
+                                }
+                                populateRecycleView();
+                            }else Toast.makeText(this, "There is no result on your search.", Toast.LENGTH_LONG).show();
                         }
                     } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (JsonParseException e) {
+                        e.printStackTrace();
+                    } catch (JsonMappingException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 },
@@ -268,5 +289,20 @@ public class MainActivity extends AppCompatActivity
         mCurrentLocation = locationUtil.getMyCurrentLocation();
     }
 
+    private void clearRecycleView() {
+        mCatalogList.clear();
+        mCatalogList.clear();
+        mRecycleAdapter.notifyDataSetChanged();
+    }
+
+    private void populateRecycleView() {
+
+        if (!mCatalogList.isEmpty()) {
+            ResultListUtil.sortCatalogListBy(mCatalogList, mCurrentLocation, ResultListUtil.ACCENDING);
+            mRecycleAdapter.notifyDataSetChanged();
+        } else {
+            Toast.makeText(this, "There is no result on your search.", Toast.LENGTH_LONG).show();
+        }
+    }
 
 }

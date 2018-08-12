@@ -26,6 +26,7 @@
         android:layout_marginTop="8dp"
         android:text="This is Product Name"
         android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/search_result_layout_distance"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/search_result_layout_image"
         app:layout_constraintTop_toTopOf="parent" />
@@ -34,26 +35,20 @@
         android:id="@+id/search_result_layout_product_shop"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
         android:text="This is Shop Location"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/search_result_layout_image"
-        app:layout_constraintTop_toBottomOf="@+id/search_result_layout_product_name" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/search_result_layout_distance"
+        app:layout_constraintStart_toEndOf="@+id/search_result_layout_image" />
 
     <TextView
         android:id="@+id/search_result_layout_distance"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:text="Distance ** KM away"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/search_result_layout_image"
-        app:layout_constraintTop_toBottomOf="@+id/search_result_layout_product_shop" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/search_result_layout_product_shop"
+        app:layout_constraintEnd_toEndOf="parent" />
 </android.support.constraint.ConstraintLayout>

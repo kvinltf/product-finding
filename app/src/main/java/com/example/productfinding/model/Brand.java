@@ -2,20 +2,23 @@ package com.example.productfinding.model;
 
 import java.io.Serializable;
 
-public class Category implements Serializable {
+public class Brand implements Serializable{
     private int id;
     private String name;
+    private String description;
 
-    public Category() {
+    public Brand() {
     }
 
-    public Category(int id, String name) {
+    public Brand(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public Brand(int id, String name, String description) {
         this.id = id;
         this.name = name;
-    }
-
-    public Category(String name) {
-        this.name = name;
+        this.description = description;
     }
 
     public int getId() {
@@ -26,6 +29,9 @@ public class Category implements Serializable {
         return name;
     }
 
+    public String getDescription() {
+        return description;
+    }
 
     public void setId(int id) {
         this.id = id;
@@ -35,12 +41,16 @@ public class Category implements Serializable {
         this.name = name;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     @Override
     public String toString() {
-        return "Category{" +
+        return "Brand{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
                 '}';
     }
 }

@@ -8,46 +8,39 @@ import java.util.List;
 public class Shop implements Serializable {
     private int id;
     private String name;
-    private LatLng latLng;
+    //    private LatLng latLng;
+    private double latitude, longitude;
     private String description;
     private String created_on;
     private List<Item> itemList;
 
-    public Shop(int id, String name, LatLng latLng, String description, String created_on, List<Item> itemList) {
+    public Shop() {
+    }
+
+    public Shop(int id, String name, double latitude, double longitude, String description, String created_on, List<Item> itemList) {
         this.id = id;
         this.name = name;
-        this.latLng = latLng;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.description = description;
         this.created_on = created_on;
         this.itemList = itemList;
     }
 
-    public Shop(String name, LatLng latLng, String description) {
-        this.name = name;
-        this.latLng = latLng;
-        this.description = description;
-    }
-
-    public Shop(String name, double lat, double lng, String description) {
-        this.name = name;
-        this.latLng = new LatLng(lat, lng);
-        this.description = description;
-    }
-
-    public Shop(int id, String name, LatLng latLng, String description, String created_on) {
+    public Shop(int id, String name, double latitude, double longitude, String description, String created_on) {
         this.id = id;
         this.name = name;
-        this.latLng = latLng;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.description = description;
         this.created_on = created_on;
     }
 
-    public Shop(int id, String name, double lat, double lng, String description, String created_on) {
-        this.id = id;
+    public Shop(String name, double latitude, double longitude, String description) {
         this.name = name;
-        this.latLng = new LatLng(lat, lng);
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.description = description;
-        this.created_on = created_on;
     }
 
     public int getId() {
@@ -62,17 +55,6 @@ public class Shop implements Serializable {
         this.name = name;
     }
 
-    public LatLng getLatLng() {
-        return latLng;
-    }
-
-    public void setLatLng(double lat, double lng) {
-        this.latLng = new LatLng(lat, lng);
-    }
-
-    public void setLatLng(LatLng latLng) {
-        this.latLng = latLng;
-    }
 
     public String getDescription() {
         return description;
@@ -102,17 +84,37 @@ public class Shop implements Serializable {
         this.itemList = itemList;
     }
 
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public LatLng getLatLng() {
+        return new LatLng(this.latitude, this.longitude);
+    }
+
     @Override
     public String toString() {
         return "Shop{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", latLng=" + latLng +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
                 ", description='" + description + '\'' +
                 ", created_on='" + created_on + '\'' +
                 ", itemList=" + itemList +
                 '}';
     }
-
 
 }

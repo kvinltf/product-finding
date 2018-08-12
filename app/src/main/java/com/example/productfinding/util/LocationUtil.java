@@ -118,7 +118,7 @@ public class LocationUtil extends Service implements LocationListener {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME_INTERVAL, DISTANCE_INTERVAL, this);
 
             if (locationManager != null) {
-                Log.d(TAG, "getMyCurrentLocation: Using "+ locationManager.NETWORK_PROVIDER);
+                Log.d(TAG, "getMyCurrentLocation: Using " + locationManager.NETWORK_PROVIDER);
                 myLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 if (myLocation != null) {
                     Log.d(TAG, "getMyCurrentLocation: " + myLocation.toString());
@@ -126,5 +126,9 @@ public class LocationUtil extends Service implements LocationListener {
             }
         }
         return myLocation;
+    }
+
+    public static float distanceToKM(float distance){
+        return distance / (float) 1000;
     }
 }
