@@ -3,10 +3,13 @@ package com.example.productfinding.adapter;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,12 +27,15 @@ public class ResultRecycleViewAdapter extends RecyclerView.Adapter<ResultRecycle
     private Location location;
     private User user;
     private String JSONData;
+    private PopupWindow mPopupWindow;
+
 
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public ResultRecycleViewAdapter(List<Catalog> catalogList, Location location) {
+    public ResultRecycleViewAdapter(List<Catalog> catalogList, Location location,PopupWindow popupWindow) {
         this.catalogList = catalogList;
         this.location = location;
+        mPopupWindow = popupWindow;
     }
 
     @NonNull
@@ -80,7 +86,6 @@ public class ResultRecycleViewAdapter extends RecyclerView.Adapter<ResultRecycle
             itemName = itemView.findViewById(R.id.search_result_layout_product_name);
             distanceToShop = itemView.findViewById(R.id.search_result_layout_distance);
             shopName = itemView.findViewById(R.id.search_result_layout_product_shop);
-
 
             itemView.setOnClickListener((View v) -> {
                 Toast.makeText(itemView.getContext(), itemName.getText().toString() + " Clicked", Toast.LENGTH_SHORT).show();

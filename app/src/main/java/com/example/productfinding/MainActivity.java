@@ -6,7 +6,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -21,6 +20,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +31,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.productfinding.adapter.ResultRecycleViewAdapter;
 import com.example.productfinding.login.LoginActivity;
 import com.example.productfinding.model.Catalog;
+import com.example.productfinding.model.CatalogHolder;
 import com.example.productfinding.model.User;
 import com.example.productfinding.util.IntentUtil;
 import com.example.productfinding.util.KeyboardUtil;
@@ -44,7 +45,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -58,14 +58,13 @@ public class MainActivity extends AppCompatActivity
     private ImageView mDrawerToggle, mSearchButton;
     private EditText mUserSearchText;
     private TextView mSearchResult;
-    private List<Catalog> mCatalogList;
+    private List<Catalog> mCatalogList = CatalogHolder.getCatalogListHolder();
     private Location mCurrentLocation;
 
     //recycle view things
     private RecyclerView.Adapter mRecycleAdapter;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,13 +87,13 @@ public class MainActivity extends AppCompatActivity
         getCurrentLocation();
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL));
 
-        mRecycleAdapter = new ResultRecycleViewAdapter(mCatalogList, mCurrentLocation);
+        mRecycleAdapter = new ResultRecycleViewAdapter(mCatalogList, mCurrentLocation, new PopupWindow(this));
         mRecyclerView.setAdapter(mRecycleAdapter);
     }
 
     private void initializeParameter() {
         mDrawerLayout = findViewById(R.id.drawer_layout);
-        mCatalogList = new ArrayList<>();
+//        mCatalogList = new ArrayList<>();
         mNavigationView = findViewById(R.id.navigation_view);
         mNavigationView.setNavigationItemSelectedListener(this);
 
@@ -107,11 +106,10 @@ public class MainActivity extends AppCompatActivity
             return false;
         });
 
-
         mDrawerToggle = findViewById(R.id.search_iv_drawer_toggle);
         mDrawerToggle.setOnClickListener(v -> mDrawerLayout.openDrawer(GravityCompat.START));
 
-        mSearchResult = findViewById(R.id.search_tv_search_result);
+        mSearchResult = findViewById(R.id.mapsearch_tv_search_result);
 
         mSearchButton = findViewById(R.id.search_iv_search_button);
         mSearchButton.setOnClickListener((View v) -> {
@@ -164,7 +162,8 @@ public class MainActivity extends AppCompatActivity
 //                                Log.d(TAG, "getCatalogList: Catalog To String:\n"+mCatalogList.toString());
                                 }
                                 populateRecycleView();
-                            }else Toast.makeText(this, "There is no result on your search.", Toast.LENGTH_LONG).show();
+                            } else
+                                Toast.makeText(this, "There is no result on your search.", Toast.LENGTH_LONG).show();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -199,7 +198,8 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(this, "Setting", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.nav_map:
-                Toast.makeText(this, "Map", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(getApplicationContext(), MapActivity.class);
+                startActivity(i);
                 return true;
             case R.id.nav_profile:
                 Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();

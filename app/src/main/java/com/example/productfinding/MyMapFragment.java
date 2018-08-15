@@ -50,13 +50,10 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback, Activ
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mView = inflater.inflate(R.layout.fragment_map, container, false);
-
+        mView = inflater.inflate(R.layout.activity_map_search, container, false);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-
         return mView;
     }
 
@@ -98,16 +95,16 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback, Activ
 //            markerOptionsList.add(new MarkerOptions().position(new LatLng(4.595989,101.077307)).title("Funtasy House Trick Art"));
 //            markerOptionsList.add(new MarkerOptions().position(new LatLng(3.161801,101.570630)).title(" Glass & Plastic Packaging Sdn Bhd"));
 
-            Button btn = mView.findViewById(R.id.map_btn_search);
-            EditText editText = mView.findViewById(R.id.map_et_query);
+            Button mSearchButton = mView.findViewById(R.id.search_iv_search_button);
+            EditText mUserSearch = mView.findViewById(R.id.search_et_search_item);
 
-            btn.setOnClickListener(v -> {
+            mSearchButton.setOnClickListener(v -> {
                 KeyboardUtil.hideSoftKeyboard(getActivity());
                 mMap.clear();
-                if (editText.getText().toString() == null || editText.getText().toString().trim().isEmpty() || editText.getText().toString().trim() == "") {
+                if (mUserSearch.getText().toString() == null || mUserSearch.getText().toString().trim().isEmpty() || mUserSearch.getText().toString().trim() == "") {
                     Toast.makeText(getContext(), "Empty String", Toast.LENGTH_SHORT).show();
                 } else {
-                    String query = editText.getText().toString();
+                    String query = mUserSearch.getText().toString();
                     for (int i = 0; i < markerOptionsList.size(); i++) {
                         int abc = (int) ((Math.random() * 10) % 2);
                         if (abc == 0) {

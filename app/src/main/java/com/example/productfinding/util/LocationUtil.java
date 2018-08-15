@@ -53,6 +53,9 @@ public class LocationUtil extends Service implements LocationListener {
         this.fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this.activity);
     }
 
+    public LocationUtil(Activity parent) {
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
