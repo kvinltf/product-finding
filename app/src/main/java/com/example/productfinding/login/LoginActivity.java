@@ -26,7 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.login_activity_main_layout);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.login_bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener((MenuItem item) -> {

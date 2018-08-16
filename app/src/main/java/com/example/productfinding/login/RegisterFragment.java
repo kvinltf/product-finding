@@ -52,7 +52,7 @@ public class RegisterFragment extends Fragment {
         Log.d(TAG, "onCreateView: Create Register Fragment View");
 
         // Inflate the layout for this fragment
-        mView = inflater.inflate(R.layout.fragment_register, container, false);
+        mView = inflater.inflate(R.layout.login_activity_fragment_resiger, container, false);
         initializeParameter();
         return mView;
     }

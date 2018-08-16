@@ -25,26 +25,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.productfinding.adapter.ResultRecycleViewAdapter;
 import com.example.productfinding.login.LoginActivity;
 import com.example.productfinding.model.Catalog;
-import com.example.productfinding.model.CatalogHolder;
 import com.example.productfinding.model.User;
 import com.example.productfinding.util.IntentUtil;
 import com.example.productfinding.util.KeyboardUtil;
 import com.example.productfinding.util.LocationUtil;
 import com.example.productfinding.util.ResultListUtil;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -58,7 +55,7 @@ public class MainActivity extends AppCompatActivity
     private ImageView mDrawerToggle, mSearchButton;
     private EditText mUserSearchText;
     private TextView mSearchResult;
-    private List<Catalog> mCatalogList = CatalogHolder.getCatalogListHolder();
+    private List<Catalog> mCatalogList = new ArrayList<>();
     private Location mCurrentLocation;
 
     //recycle view things
@@ -165,19 +162,11 @@ public class MainActivity extends AppCompatActivity
                             } else
                                 Toast.makeText(this, "There is no result on your search.", Toast.LENGTH_LONG).show();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (JsonParseException e) {
-                        e.printStackTrace();
-                    } catch (JsonMappingException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
+                    } catch (JSONException | IOException e) {
                         e.printStackTrace();
                     }
                 },
-                (VolleyError error) -> {
-                    error.printStackTrace();
-                }
+                Throwable::printStackTrace
         );
         Volley.newRequestQueue(getApplicationContext()).add(jsonObjectRequest);
     }
@@ -264,7 +253,7 @@ public class MainActivity extends AppCompatActivity
 
             SharedPreferences sharedPreferences =
                     getSharedPreferences(getString(R.string.share_preference_current_user), MODE_PRIVATE);
-            sharedPreferences.edit().clear().commit();
+            sharedPreferences.edit().clear().apply();
             startActivity(i);
             finish();
         });

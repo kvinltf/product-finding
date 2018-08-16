@@ -57,7 +57,7 @@ public class LoginFragment extends Fragment {
         Log.d(TAG, "onCreateView: Create Login Fragment View");
 
         // Inflate the layout for this fragment
-        mView = inflater.inflate(R.layout.fragment_login, container, false);
+        mView = inflater.inflate(R.layout.login_activity_fragment_login, container, false);
 
         initializeParameter();
         //check is user logged in? else Proceed to Login Process
