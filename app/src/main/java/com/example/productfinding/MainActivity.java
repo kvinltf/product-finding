@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity
         getCurrentLocation();
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL));
 
-        mRecycleAdapter = new ResultRecycleViewAdapter(mCatalogList, mCurrentLocation, new PopupWindow(this));
+        mRecycleAdapter = new ResultRecycleViewAdapter(mCatalogList, mCurrentLocation);
         mRecyclerView.setAdapter(mRecycleAdapter);
     }
 

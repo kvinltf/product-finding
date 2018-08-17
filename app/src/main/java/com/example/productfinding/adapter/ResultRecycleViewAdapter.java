@@ -1,21 +1,22 @@
 package com.example.productfinding.adapter;
 
+import android.content.Intent;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.productfinding.MapPopupActivity;
 import com.example.productfinding.R;
 import com.example.productfinding.model.Catalog;
 import com.example.productfinding.model.User;
+import com.example.productfinding.util.IntentUtil;
 import com.example.productfinding.util.LocationUtil;
 
 import java.util.List;
@@ -27,15 +28,13 @@ public class ResultRecycleViewAdapter extends RecyclerView.Adapter<ResultRecycle
     private Location location;
     private User user;
     private String JSONData;
-    private PopupWindow mPopupWindow;
 
 
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public ResultRecycleViewAdapter(List<Catalog> catalogList, Location location,PopupWindow popupWindow) {
+    public ResultRecycleViewAdapter(List<Catalog> catalogList, Location location) {
         this.catalogList = catalogList;
         this.location = location;
-        mPopupWindow = popupWindow;
     }
 
     @NonNull
@@ -65,6 +64,7 @@ public class ResultRecycleViewAdapter extends RecyclerView.Adapter<ResultRecycle
         }
         holder.shopName.setText(_shopName);
         holder.itemName.setText(_itemName);
+        holder.catalog = catalogList.get(position);
     }
 
     @Override
@@ -78,6 +78,7 @@ public class ResultRecycleViewAdapter extends RecyclerView.Adapter<ResultRecycle
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView itemImage;
         TextView itemName, distanceToShop, shopName;
+        Catalog catalog;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -89,6 +90,10 @@ public class ResultRecycleViewAdapter extends RecyclerView.Adapter<ResultRecycle
 
             itemView.setOnClickListener((View v) -> {
                 Toast.makeText(itemView.getContext(), itemName.getText().toString() + " Clicked", Toast.LENGTH_SHORT).show();
+
+                Intent i = new Intent(v.getContext(), MapPopupActivity.class);
+                i.putExtra("catalog",catalog);
+                v.getContext().startActivity(i);
             });
         }
     }
