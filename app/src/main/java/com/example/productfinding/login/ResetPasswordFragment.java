@@ -18,11 +18,19 @@ import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.productfinding.R;
+import com.example.productfinding.model.ResponseObject;
+import com.example.productfinding.model.User;
 import com.example.productfinding.util.EmailUtil;
 import com.example.productfinding.util.KeyboardUtil;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 
 /**
@@ -90,15 +98,14 @@ public class ResetPasswordFragment extends Fragment {
                 jsonObject,
                 response -> {
                     try {
+                        final ObjectMapper objectMapper = new ObjectMapper();
+                        ResponseObject responseObject = objectMapper.readValue(response.toString(),ResponseObject.class);
 
-                        Log.d(TAG, "resetPassword: " + response.toString());
-                        Toast.makeText(getContext(), response.getString("result"), Toast.LENGTH_LONG).show();
-
-                        if (response.getString("status").equalsIgnoreCase("success")) {
+                        Toast.makeText(getContext(), responseObject.getMessage(), Toast.LENGTH_SHORT).show();
+                        if (responseObject.isStatusSuccess()) {
                             backToLoginFragment();
                         }
-                    } catch (JSONException e) {
-                        Log.d(TAG, "JsonObjectRequest: JSONException " + e.getMessage());
+                    } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
                         showProgressBar(false);

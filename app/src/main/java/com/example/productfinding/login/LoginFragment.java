@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -20,13 +21,20 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.productfinding.MainActivity;
 import com.example.productfinding.R;
+import com.example.productfinding.model.ResponseObject;
 import com.example.productfinding.model.User;
 import com.example.productfinding.util.EmailUtil;
 import com.example.productfinding.util.IntentUtil;
 import com.example.productfinding.util.KeyboardUtil;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 /**
  * A simple {@link Fragment} subclass that login user.
@@ -52,7 +60,7 @@ public class LoginFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: Create Login Fragment View");
 
@@ -88,8 +96,9 @@ public class LoginFragment extends Fragment {
 
             if (isInputValid()) {
                 userLogin();
-            } else
+            } else {
                 return;
+            }
         });
     }
 
@@ -116,30 +125,26 @@ public class LoginFragment extends Fragment {
                 Request.Method.POST,
                 url,
                 jsonObject,
-                response -> {
+                (JSONObject response) -> {
                     try {
+
+                        final ObjectMapper objectMapper = new ObjectMapper();
+                        ResponseObject<User> userResponseObject = objectMapper.readValue(response.toString(),new TypeReference<ResponseObject<User>>(){});
+
                         //Request SUCCESS
-                        if (response.getString("status").equalsIgnoreCase("success")) {
+                        if (userResponseObject.isStatusSuccess()) {
                             Log.i(TAG, "onResponse: Success Verify User");
-                            Log.d(TAG, "onResponse() called with: response = [" + response.toString() + "]");
+                            Log.d(TAG, "onResponse() called with: response = [" + userResponseObject.getMessage() + "]");
 
-                            JSONObject userResult = response.getJSONObject("result");
-                            User currentUser = new User(
-                                    userResult.getInt("id"),
-                                    userResult.getString("name"),
-                                    userResult.getString("email"),
-                                    userResult.getString("password"),
-                                    userResult.getString("created_on")
-                            );
-
+                            User currentUser = userResponseObject.getQuery_result();
                             if (mRememberMeCb.isChecked()) {
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putInt("id", currentUser.getId());
                                 editor.putString("name", currentUser.getName());
                                 editor.putString("email", currentUser.getEmail());
                                 editor.putString("password", currentUser.getPassword());
-                                editor.putString("created_on", currentUser.getCreated_on().toString());
-                                editor.commit();
+                                editor.putString("created_on", currentUser.getCreated_on());
+                                editor.apply();
                             }
                             startMainActivity(currentUser);
                         }
@@ -154,6 +159,8 @@ public class LoginFragment extends Fragment {
                         Log.d(TAG, "userLogin: Error --> JSONException: " + e.getMessage());
                         e.printStackTrace();
                         showProgressBar(false);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 },
                 error -> {

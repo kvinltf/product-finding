@@ -17,11 +17,19 @@ import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.productfinding.R;
+import com.example.productfinding.model.ResponseObject;
+import com.example.productfinding.model.User;
 import com.example.productfinding.util.EmailUtil;
 import com.example.productfinding.util.KeyboardUtil;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 /**
  * A {@link Fragment} subclass that register new user.
@@ -106,8 +114,11 @@ public class RegisterFragment extends Fragment {
                 jsonObject,
                 response -> {
                     try {
+                        final ObjectMapper objectMapper = new ObjectMapper();
+                        ResponseObject responseObject = objectMapper.readValue(response.toString(),ResponseObject.class);
+
                         //Request SUCCESS
-                        if (response.getString("status").equalsIgnoreCase("success")) {
+                        if (responseObject.isStatusSuccess()) {
                             Toast.makeText(getContext(), "Success Register New User", Toast.LENGTH_SHORT).show();
                             backToLoginFragment();
                         }
@@ -120,8 +131,7 @@ public class RegisterFragment extends Fragment {
                         }
                         Log.d(TAG, "registerUser() Message-> " + response.toString());
 
-                    } catch (JSONException e) {
-                        Log.d(TAG, "registerUser: Error --> JSONException: " + e.getMessage());
+                    } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
                         showProgressBar(false);
