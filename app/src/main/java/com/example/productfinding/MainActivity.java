@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,11 +29,13 @@ import com.android.volley.toolbox.Volley;
 import com.example.productfinding.adapter.ResultRecycleViewAdapter;
 import com.example.productfinding.login.LoginActivity;
 import com.example.productfinding.model.Catalog;
+import com.example.productfinding.model.ResponseObject;
 import com.example.productfinding.model.User;
 import com.example.productfinding.util.IntentUtil;
 import com.example.productfinding.util.KeyboardUtil;
 import com.example.productfinding.util.LocationUtil;
 import com.example.productfinding.util.ResultListUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONException;
@@ -83,14 +84,13 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setLayoutManager(mLayoutManager);
         getCurrentLocation();
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL));
-
         mRecycleAdapter = new ResultRecycleViewAdapter(mCatalogList, mCurrentLocation);
         mRecyclerView.setAdapter(mRecycleAdapter);
     }
 
+
     private void initializeParameter() {
         mDrawerLayout = findViewById(R.id.drawer_layout);
-//        mCatalogList = new ArrayList<>();
         mNavigationView = findViewById(R.id.navigation_view);
         mNavigationView.setNavigationItemSelectedListener(this);
 
@@ -143,26 +143,23 @@ public class MainActivity extends AppCompatActivity
                 Request.Method.POST, url, jsonObject,
                 (JSONObject response) -> {
                     try {
-                        if (response.getString("status").equalsIgnoreCase("success")) {
+                        final ObjectMapper objectMapper = new ObjectMapper();
+                        ResponseObject<List<Catalog>> responseObject =
+                                objectMapper.readValue(response.toString(), new TypeReference<ResponseObject<List<Catalog>>>() {
+                                });
+//
+                        if (responseObject.isStatusSuccess()) {
                             Log.d(TAG, "getCatalogList: Success");
 
-                            ObjectMapper objectMapper = new ObjectMapper();
-                            if (!response.isNull("result")) {
-                                JSONObject resultList = response.getJSONObject("result");
-
-                                for (int i = 0; i < resultList.length(); i++) {
-                                    JSONObject catalogJsonObject = resultList.getJSONObject(String.valueOf(i));
-                                    Catalog catalog = objectMapper.readValue(catalogJsonObject.toString(), Catalog.class);
-//                                Log.d(TAG, "Catalog after Object Mapper: "+catalog.toString());
-
-                                    mCatalogList.add(catalog);
-//                                Log.d(TAG, "getCatalogList: Catalog To String:\n"+mCatalogList.toString());
+                            if (responseObject.getQuery_result().size() > 0) {
+                                for (int i = 0; i < responseObject.getQuery_result().size(); i++) {
+                                    mCatalogList.add(responseObject.getQuery_result().get(i));
                                 }
                                 populateRecycleView();
                             } else
                                 Toast.makeText(this, "There is no result on your search.", Toast.LENGTH_LONG).show();
                         }
-                    } catch (JSONException | IOException e) {
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 },
