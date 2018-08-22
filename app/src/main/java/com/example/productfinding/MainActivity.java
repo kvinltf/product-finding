@@ -173,6 +173,7 @@ public class MainActivity extends AppCompatActivity
         item.setChecked(true);
         mDrawerLayout.closeDrawers();
 
+        Intent _intent;
         switch (item.getItemId()) {
             case R.id.nav_history:
                 Toast.makeText(this, "History Selected", Toast.LENGTH_SHORT).show();
@@ -184,16 +185,21 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(this, "Setting", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.nav_map:
-                Intent i = new Intent(getApplicationContext(), MapActivity.class);
-                startActivity(i);
+                _intent = new Intent(getApplicationContext(), MapActivity.class);
+                startActivity(_intent);
                 return true;
             case R.id.nav_profile:
-                Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
+                _intent = new Intent(this, ProfileActivity.class);
+                IntentUtil.setLoginUserForIntent(_intent,mLoginUser);
+                startActivity(_intent);
                 return true;
+
 
         }
         return true;
     }
+
 
     @Override
     public void onBackPressed() {
@@ -287,7 +293,7 @@ public class MainActivity extends AppCompatActivity
             ResultListUtil.sortCatalogListBy(mCatalogList, mCurrentLocation, ResultListUtil.ACCENDING);
             mRecycleAdapter.notifyDataSetChanged();
         } else {
-            Toast.makeText(this, "There is no result on your search.", Toast.LENGTH_LONG).show();
+
         }
     }
 

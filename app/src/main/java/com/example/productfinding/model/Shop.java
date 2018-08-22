@@ -8,7 +8,6 @@ import java.util.List;
 public class Shop implements Serializable {
     private int id;
     private String name;
-    //    private LatLng latLng;
     private double latitude, longitude;
     private String description;
     private String created_on;

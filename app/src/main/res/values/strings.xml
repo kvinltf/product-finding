@@ -48,6 +48,7 @@
     <string name="url_user">http://kvinltf.me/productfinding/android/user.php</string>
     <string name="url_shop">http://kvinltf.me/productfinding/android/shop.php</string>
     <string name="url_catalog">http://kvinltf.me/productfinding/android/catalog.php</string>
+    <string name="url_shop_owner">http://kvinltf.me/productfinding/android/shop_owner.php</string>
     <string name="remember_me">Remember Me</string>
     <string name="retype_the_password">Retype the password</string>
 </resources>

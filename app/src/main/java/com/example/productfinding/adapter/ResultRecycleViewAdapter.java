@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,7 +15,6 @@ import com.example.productfinding.MapPopupActivity;
 import com.example.productfinding.R;
 import com.example.productfinding.model.Catalog;
 import com.example.productfinding.model.User;
-import com.example.productfinding.util.IntentUtil;
 import com.example.productfinding.util.LocationUtil;
 
 import java.util.List;

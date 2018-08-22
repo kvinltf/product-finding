@@ -47,14 +47,13 @@
 
         <activity
             android:name=".MapActivity"
-            android:label="@string/title_activity_maps"></activity>
-
+            android:label="@string/title_activity_maps" />
         <activity
             android:name=".MapPopupActivity"
             android:label="MapPopUp"
-            android:theme="@style/AppTheme.MyPopupMapTheme">
-        </activity>
+            android:theme="@style/AppTheme.MyPopupMapTheme"></activity>
 
+        <activity android:name=".ProfileActivity"></activity>
     </application>
 
 </manifest>
