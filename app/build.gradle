@@ -47,6 +47,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-core:2.9.6'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.6'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.6'
+    implementation 'com.android.support:mediarouter-v7:27.1.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

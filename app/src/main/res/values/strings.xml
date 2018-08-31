@@ -51,4 +51,5 @@
     <string name="url_shop_owner">http://kvinltf.me/productfinding/android/shop_owner.php</string>
     <string name="remember_me">Remember Me</string>
     <string name="retype_the_password">Retype the password</string>
+    <string name="sort">Sort</string>
 </resources>

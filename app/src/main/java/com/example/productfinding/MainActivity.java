@@ -13,13 +13,18 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,18 +51,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener {
 
     private static final String TAG = "MainActivity";
 
     private DrawerLayout mDrawerLayout;
     private User mLoginUser;
     private NavigationView mNavigationView;
-    private ImageView mDrawerToggle, mSearchButton;
+    private ImageView mDrawerToggle, mSearchButton, mMoreButton;
     private EditText mUserSearchText;
     private TextView mSearchResult;
-    private List<Catalog> mCatalogList = new ArrayList<>();
+    private List<Catalog> mDisplayCatalogList = new ArrayList<>();
+    private List<Catalog> mFullCatalogList = new ArrayList<>();
     private Location mCurrentLocation;
+
+    private static Boolean isSortByAscending;
+    private static int distanceFilter;
 
     //recycle view things
     private RecyclerView.Adapter mRecycleAdapter;
@@ -68,6 +77,9 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (isSortByAscending == null) isSortByAscending = true;
+        if (distanceFilter == 0) distanceFilter = 10;
 
         initializeParameter();
         initializeRecycleView();
@@ -84,10 +96,9 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setLayoutManager(mLayoutManager);
         getCurrentLocation();
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL));
-        mRecycleAdapter = new ResultRecycleViewAdapter(mCatalogList, mCurrentLocation);
+        mRecycleAdapter = new ResultRecycleViewAdapter(mDisplayCatalogList, mCurrentLocation);
         mRecyclerView.setAdapter(mRecycleAdapter);
     }
-
 
     private void initializeParameter() {
         mDrawerLayout = findViewById(R.id.drawer_layout);
@@ -123,12 +134,28 @@ public class MainActivity extends AppCompatActivity
         });
 
         mLoginUser = IntentUtil.getLoginUserFromIntent(getIntent());
+
+        mMoreButton = findViewById(R.id.search_iv_more);
+        mMoreButton.setOnClickListener(v -> showPopup(v));
+    }
+
+    public void showPopup(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.main_menu, popup.getMenu());
+        popup.setOnMenuItemClickListener(this::onMenuItemClick);
+
+        setSortPopUpTitle(popup.getMenu().findItem(R.id.main_menu_sort));
+        setMenuDistance(popup.getMenu().findItem(R.id.main_menu_distance));
+
+        popup.show();
     }
 
     private void getCatalogList(String userSearch) {
         Log.d(TAG, "getCatalogList: Executing");
         String url = getString(R.string.url_catalog);
-        mCatalogList.clear();
+        mFullCatalogList.clear();
+        mDisplayCatalogList.clear();
 
         JSONObject jsonObject = new JSONObject();
 
@@ -153,7 +180,7 @@ public class MainActivity extends AppCompatActivity
 
                             if (responseObject.getQuery_result().size() > 0) {
                                 for (int i = 0; i < responseObject.getQuery_result().size(); i++) {
-                                    mCatalogList.add(responseObject.getQuery_result().get(i));
+                                    mFullCatalogList.add(responseObject.getQuery_result().get(i));
                                 }
                                 populateRecycleView();
                             } else
@@ -191,7 +218,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_profile:
 //                Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
                 _intent = new Intent(this, ProfileActivity.class);
-                IntentUtil.setLoginUserForIntent(_intent,mLoginUser);
+                IntentUtil.setLoginUserForIntent(_intent, mLoginUser);
                 startActivity(_intent);
                 return true;
 
@@ -215,9 +242,9 @@ public class MainActivity extends AppCompatActivity
 
     /*
      * Open the drawer when the button is tapped
-     * To open the drawer when the user taps on the nav drawer button,
+     * To open the drawer when the user taps on the main_menu drawer button,
      * override onOptionsItemSelected() to hook into the options menu framework and listen for when the user taps the item with the ID android.R.id.home.
-     * Then call openDrawer() to open the nav drawer:
+     * Then call openDrawer() to open the main_menu drawer:
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -242,7 +269,6 @@ public class MainActivity extends AppCompatActivity
         String _email = mLoginUser.getEmail();
         userEmail.setText(_email);
     }
-
 
     /**
      * Logout User and Clear Shared Preferences Data
@@ -275,26 +301,121 @@ public class MainActivity extends AppCompatActivity
         builder.show();
     }
 
-
     private void getCurrentLocation() {
         LocationUtil locationUtil = new LocationUtil(this, getApplicationContext());
         mCurrentLocation = locationUtil.getMyCurrentLocation();
     }
 
     private void clearRecycleView() {
-        mCatalogList.clear();
-        mCatalogList.clear();
+        mDisplayCatalogList.clear();
+        mDisplayCatalogList.clear();
         mRecycleAdapter.notifyDataSetChanged();
     }
 
     private void populateRecycleView() {
+        if (mFullCatalogList.isEmpty()) return;
 
-        if (!mCatalogList.isEmpty()) {
-            ResultListUtil.sortCatalogListBy(mCatalogList, mCurrentLocation, ResultListUtil.ACCENDING);
+        mDisplayCatalogList.clear();
+
+        if (distanceFilter != 0) {
+            for (int i = 0; i < mFullCatalogList.size(); i++) {
+                Location shopLocation = new Location("");
+                shopLocation.setLatitude(mFullCatalogList.get(i).getShop().getLatitude());
+                shopLocation.setLongitude(mFullCatalogList.get(i).getShop().getLongitude());
+
+                if (LocationUtil.distanceToKM(mCurrentLocation.distanceTo(shopLocation)) <= (float) distanceFilter) {
+                    mDisplayCatalogList.add(mFullCatalogList.get(i));
+                }
+            }
+
+        } else {
+            for (int i = 0; i < mFullCatalogList.size(); i++) {
+                mDisplayCatalogList.add(mFullCatalogList.get(i));
+            }
+        }
+
+        if (!mDisplayCatalogList.isEmpty()) {
+            if (isSortByAscending)
+                ResultListUtil.sortCatalogListBy(mDisplayCatalogList, mCurrentLocation, ResultListUtil.ACCENDING);
+            else
+                ResultListUtil.sortCatalogListBy(mDisplayCatalogList, mCurrentLocation, ResultListUtil.DECENDING);
             mRecycleAdapter.notifyDataSetChanged();
         } else {
-
+//            Toast.makeText(this, "The Search List is Empty", Toast.LENGTH_SHORT).show();
         }
     }
 
+
+    /*Popup Menu Item Click*/
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.main_menu_sort:
+                isSortByAscending = !isSortByAscending;
+                setSortPopUpTitle(item);
+                populateRecycleView();
+                return true;
+            case R.id.main_menu_distance:
+                createPopUpSeekBar();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setSortPopUpTitle(MenuItem menuItem) {
+        menuItem.setTitle(isSortByAscending ?
+                "Sort By: Ascending" : "Sort By: Descending");
+    }
+
+    private void setMenuDistance(MenuItem menuItem) {
+        menuItem.setTitle("Filter Distance: " + distanceFilter + " KM");
+    }
+
+    private void createPopUpSeekBar() {
+        LinearLayout linearLayout = new LinearLayout(this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+
+        TextView distanceTextView = new TextView(this);
+        distanceTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+        distanceTextView.setText(distanceFilter + "KM");
+
+        SeekBar seekBar = new SeekBar(this);
+        seekBar.setMax(100);
+        seekBar.setProgress(distanceFilter);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                distanceTextView.setText(String.valueOf(progress) + "KM");
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        TextView messageTextView = new TextView(this);
+        messageTextView.setText("Set to 0 to turn off filter");
+        messageTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+        linearLayout.addView(distanceTextView);
+        linearLayout.addView(seekBar);
+        linearLayout.addView(messageTextView);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Filter Distance")
+                .setView(linearLayout)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    distanceFilter = seekBar.getProgress();
+                    populateRecycleView();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
 }
