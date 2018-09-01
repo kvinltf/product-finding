@@ -18,7 +18,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-
         <activity
             android:name=".login.LoginActivity"
             android:configChanges="orientation"
@@ -29,7 +28,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation"
@@ -49,13 +47,25 @@
 
         <activity
             android:name=".MapActivity"
-            android:label="@string/title_activity_maps" />
+            android:configChanges="orientation"
+            android:label="@string/title_activity_maps"
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".MapPopupActivity"
             android:label="MapPopUp"
-            android:theme="@style/AppTheme.MyPopupMapTheme"></activity>
-
-        <activity android:name=".ProfileActivity"></activity>
+            android:theme="@style/AppTheme.MyPopupMapTheme" />
+        <activity
+            android:name=".UserProfileActivity"
+            android:configChanges="orientation"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".ShopProfileActivity"
+            android:configChanges="orientation"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".AddItemToShopActivity"
+            android:configChanges="orientation"
+            android:windowSoftInputMode="stateHidden"></activity>
     </application>
 
 </manifest>

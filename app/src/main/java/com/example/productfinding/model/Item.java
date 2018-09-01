@@ -11,6 +11,7 @@ public class Item implements Serializable {
     private Brand brand;
     private Category category;
     private List<Shop> shopList;
+    private boolean isChecked;
 
     public Item() {
     }
@@ -79,6 +80,14 @@ public class Item implements Serializable {
         this.shopList = shopList;
     }
 
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
+    }
+
     @Override
     public String toString() {
         return "Item{" +
@@ -88,6 +97,7 @@ public class Item implements Serializable {
                 ", brand=" + brand +
                 ", category=" + category +
                 ", shopList=" + shopList +
+                ", isChecked=" + isChecked +
                 '}';
     }
 }

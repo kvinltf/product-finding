@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity
         initializeParameter();
         initializeRecycleView();
         initNavigationDrawerHeader();
+
     }
 
     private void initializeRecycleView() {
@@ -184,7 +185,7 @@ public class MainActivity extends AppCompatActivity
                                 }
                                 populateRecycleView();
                             } else
-                                Toast.makeText(this, "There is no result on your search.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(this, "No Result on this keyword, try again using another.", Toast.LENGTH_LONG).show();
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -217,7 +218,7 @@ public class MainActivity extends AppCompatActivity
                 return true;
             case R.id.nav_profile:
 //                Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
-                _intent = new Intent(this, ProfileActivity.class);
+                _intent = new Intent(this, UserProfileActivity.class);
                 IntentUtil.setLoginUserForIntent(_intent, mLoginUser);
                 startActivity(_intent);
                 return true;
@@ -308,43 +309,43 @@ public class MainActivity extends AppCompatActivity
 
     private void clearRecycleView() {
         mDisplayCatalogList.clear();
-        mDisplayCatalogList.clear();
+        mFullCatalogList.clear();
         mRecycleAdapter.notifyDataSetChanged();
     }
 
     private void populateRecycleView() {
         if (mFullCatalogList.isEmpty()) return;
+        else {
+            mDisplayCatalogList.clear();
 
-        mDisplayCatalogList.clear();
+            if (distanceFilter != 0) {
+                for (int i = 0; i < mFullCatalogList.size(); i++) {
+                    Location shopLocation = new Location("");
+                    shopLocation.setLatitude(mFullCatalogList.get(i).getShop().getLatitude());
+                    shopLocation.setLongitude(mFullCatalogList.get(i).getShop().getLongitude());
 
-        if (distanceFilter != 0) {
-            for (int i = 0; i < mFullCatalogList.size(); i++) {
-                Location shopLocation = new Location("");
-                shopLocation.setLatitude(mFullCatalogList.get(i).getShop().getLatitude());
-                shopLocation.setLongitude(mFullCatalogList.get(i).getShop().getLongitude());
+                    if (LocationUtil.distanceToKM(mCurrentLocation.distanceTo(shopLocation)) <= (float) distanceFilter) {
+                        mDisplayCatalogList.add(mFullCatalogList.get(i));
+                    }
+                }
 
-                if (LocationUtil.distanceToKM(mCurrentLocation.distanceTo(shopLocation)) <= (float) distanceFilter) {
+            } else {
+                for (int i = 0; i < mFullCatalogList.size(); i++) {
                     mDisplayCatalogList.add(mFullCatalogList.get(i));
                 }
             }
 
-        } else {
-            for (int i = 0; i < mFullCatalogList.size(); i++) {
-                mDisplayCatalogList.add(mFullCatalogList.get(i));
+            if (!mDisplayCatalogList.isEmpty()) {
+                if (isSortByAscending)
+                    ResultListUtil.sortCatalogListBy(mDisplayCatalogList, mCurrentLocation, ResultListUtil.ACCENDING);
+                else
+                    ResultListUtil.sortCatalogListBy(mDisplayCatalogList, mCurrentLocation, ResultListUtil.DECENDING);
+            } else {
+                Toast.makeText(this, "No Result within This Distance", Toast.LENGTH_SHORT).show();
             }
-        }
-
-        if (!mDisplayCatalogList.isEmpty()) {
-            if (isSortByAscending)
-                ResultListUtil.sortCatalogListBy(mDisplayCatalogList, mCurrentLocation, ResultListUtil.ACCENDING);
-            else
-                ResultListUtil.sortCatalogListBy(mDisplayCatalogList, mCurrentLocation, ResultListUtil.DECENDING);
             mRecycleAdapter.notifyDataSetChanged();
-        } else {
-//            Toast.makeText(this, "The Search List is Empty", Toast.LENGTH_SHORT).show();
         }
     }
-
 
     /*Popup Menu Item Click*/
     @Override
@@ -409,7 +410,7 @@ public class MainActivity extends AppCompatActivity
         linearLayout.addView(messageTextView);
 
         new AlertDialog.Builder(this)
-                .setTitle("Filter Distance")
+                .setTitle("Distance Filter")
                 .setView(linearLayout)
                 .setPositiveButton("OK", (dialog, which) -> {
                     distanceFilter = seekBar.getProgress();

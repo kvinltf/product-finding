@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.productfinding.adapter.ProfileShopRecycleViewAdapter;
+import com.example.productfinding.adapter.UserProfileShopListRecycleViewAdapter;
 import com.example.productfinding.model.ResponseObject;
 import com.example.productfinding.model.Shop;
 import com.example.productfinding.model.User;
@@ -31,8 +31,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfileActivity extends AppCompatActivity {
-    private static final String TAG = "ProfileActivity";
+public class UserProfileActivity extends AppCompatActivity {
+    private static final String TAG = "UserProfileActivity";
 
     private User mCurrentLoginUser;
     private TextView mUserName, mUserEmail;
@@ -51,7 +51,7 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.profile_activity_main_layout);
+        setContentView(R.layout.user_profile_activity_main_layout);
         mCurrentLoginUser = IntentUtil.getLoginUserFromIntent(getIntent());
 
         mUserName = findViewById(R.id.profile_tv_user_name);
@@ -77,7 +77,7 @@ public class ProfileActivity extends AppCompatActivity {
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL));
-        mRecycleAdapter = new ProfileShopRecycleViewAdapter(mOwnShopList);
+        mRecycleAdapter = new UserProfileShopListRecycleViewAdapter(mOwnShopList);
         mRecyclerView.setAdapter(mRecycleAdapter);
     }
 
@@ -182,7 +182,6 @@ public class ProfileActivity extends AppCompatActivity {
         }
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST, url, jsonObject,
                 response -> {
-                    Log.d(TAG, "getUserOwnedShop: RESPONE::" + response.toString());
                     try {
                         ResponseObject<List<Shop>> responseObject = objectMapper.readValue(response.toString(), new TypeReference<ResponseObject<List<Shop>>>() {
                         });
