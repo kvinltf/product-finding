@@ -1,12 +1,20 @@
 package com.example.productfinding.login;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,15 +34,15 @@ import com.example.productfinding.model.User;
 import com.example.productfinding.util.EmailUtil;
 import com.example.productfinding.util.IntentUtil;
 import com.example.productfinding.util.KeyboardUtil;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+
+import static com.example.productfinding.login.LoginActivity.PERMISSIONS_REQUEST_LOCATION;
 
 /**
  * A simple {@link Fragment} subclass that login user.
@@ -94,7 +102,12 @@ public class LoginFragment extends Fragment {
             Log.d(TAG, "Login Button CLicked");
             KeyboardUtil.hideSoftKeyboard(getActivity());
 
-            if (isInputValid()) {
+
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
+            } else if (isInputValid()) {
                 userLogin();
             } else {
                 return;
@@ -129,7 +142,8 @@ public class LoginFragment extends Fragment {
                     try {
 
                         final ObjectMapper objectMapper = new ObjectMapper();
-                        ResponseObject<User> userResponseObject = objectMapper.readValue(response.toString(),new TypeReference<ResponseObject<User>>(){});
+                        ResponseObject<User> userResponseObject = objectMapper.readValue(response.toString(), new TypeReference<ResponseObject<User>>() {
+                        });
 
                         //Request SUCCESS
                         if (userResponseObject.isStatusSuccess()) {
@@ -234,5 +248,41 @@ public class LoginFragment extends Fragment {
      */
     private void showProgressBar(Boolean show) {
         mView.findViewById(R.id.progress_bar_layout).setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+
+
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //permission granted
+
+                } else {
+                    //permission not granted
+//                    boolean showRationale = shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION);
+                    if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                        new AlertDialog.Builder(getContext())
+                                .setTitle("Location Permission")
+                                .setMessage("This Application needs Location Permission to Function Normally." +
+                                        "\n\nPlease go to setting to enable the Location Permissions" +
+                                        "\n\nUnder \"Permission\" --> \"Location\"")
+                                .setPositiveButton("I understand", (dialog, which) -> {
+                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                    Uri uri = Uri.fromParts("package", getContext().getPackageName(), null);
+                                    intent.setData(uri);
+                                    startActivity(intent);
+                                }).show();
+                    } else if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                        requestPermissions(new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATION);
+                    }
+                }
+                return;
+            }
+        }
     }
 }

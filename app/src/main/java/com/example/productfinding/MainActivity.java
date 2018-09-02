@@ -1,12 +1,18 @@
 package com.example.productfinding;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -53,6 +59,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.productfinding.login.LoginActivity.PERMISSIONS_REQUEST_LOCATION;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener {
 
@@ -81,7 +89,7 @@ public class MainActivity extends AppCompatActivity
     private CheckBox mItemNameCB, mItemDescCB, mShopNameCB, mShopDescCB, mBrandNameCB, mBrandDescCB, mCategoryCB;
     private FilterCondition filterCondition = new FilterCondition();
 
-    @Override
+
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -466,32 +474,17 @@ public class MainActivity extends AppCompatActivity
         mBrandDescCB.setChecked(filterCondition.isBrandDesc());
         mCategoryCB.setChecked(filterCondition.isCategory());
 
-        mItemNameCB.setOnClickListener(v -> {
-            filterCondition.setItemName(mItemNameCB.isChecked());
-        });
-        mItemDescCB.setOnClickListener(v -> {
-            filterCondition.setItemDesc(mItemDescCB.isChecked());
-        });
-        mShopNameCB.setOnClickListener(v -> {
-            filterCondition.setShopName(mShopNameCB.isChecked());
-        });
-        mShopDescCB.setOnClickListener(v -> {
-            filterCondition.setShopDesc(mShopDescCB.isChecked());
-        });
-        mBrandNameCB.setOnClickListener(v -> {
-            filterCondition.setBrandName(mBrandNameCB.isChecked());
-        });
-        mBrandDescCB.setOnClickListener(v -> {
-            filterCondition.setBrandDesc(mBrandDescCB.isChecked());
-        });
-        mCategoryCB.setOnClickListener(v -> {
-            filterCondition.setCategory(mCategoryCB.isChecked());
-        });
+        mItemNameCB.setOnClickListener(v -> filterCondition.setItemName(mItemNameCB.isChecked()));
+        mItemDescCB.setOnClickListener(v -> filterCondition.setItemDesc(mItemDescCB.isChecked()));
+        mShopNameCB.setOnClickListener(v -> filterCondition.setShopName(mShopNameCB.isChecked()));
+        mShopDescCB.setOnClickListener(v -> filterCondition.setShopDesc(mShopDescCB.isChecked()));
+        mBrandNameCB.setOnClickListener(v -> filterCondition.setBrandName(mBrandNameCB.isChecked()));
+        mBrandDescCB.setOnClickListener(v -> filterCondition.setBrandDesc(mBrandDescCB.isChecked()));
+        mCategoryCB.setOnClickListener(v -> filterCondition.setCategory(mCategoryCB.isChecked()));
     }
 
 
 }
-
 
 class FilterCondition {
 
