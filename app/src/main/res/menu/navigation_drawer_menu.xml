@@ -24,6 +24,9 @@
             android:title="@string/txt_add_item" />
 
         <item
+            android:id="@+id/nav_add_shop"
+            android:title="Add New Shop" />
+        <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_icons_logout"
             android:title="@string/txt_logout" />

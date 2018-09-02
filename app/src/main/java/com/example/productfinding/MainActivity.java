@@ -1,18 +1,12 @@
 package com.example.productfinding;
 
-import android.Manifest;
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -58,8 +52,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.example.productfinding.login.LoginActivity.PERMISSIONS_REQUEST_LOCATION;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, PopupMenu.OnMenuItemClickListener {
@@ -249,6 +241,10 @@ public class MainActivity extends AppCompatActivity
                 return true;
             case R.id.nav_add_item:
                 _intent = new Intent(this, CreateItemActivity.class);
+                startActivity(_intent);
+                return true;
+            case R.id.nav_add_shop:
+                _intent = new Intent(this, GetShopLatLngActivity.class);
                 startActivity(_intent);
                 return true;
         }
