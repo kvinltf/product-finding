@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <CheckBox
+        android:id="@+id/filter_condition_cb_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Item Name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <CheckBox
+        android:id="@+id/filter_condition_cb_shop_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Shop Name"
+        app:layout_constraintStart_toStartOf="@+id/filter_condition_cb_item_name"
+        app:layout_constraintTop_toBottomOf="@+id/filter_condition_cb_item_name" />
+
+    <CheckBox
+        android:id="@+id/filter_condition_cb_shop_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Shop Description"
+        app:layout_constraintBaseline_toBaselineOf="@+id/filter_condition_cb_shop_name"
+        app:layout_constraintStart_toStartOf="@+id/filter_condition_cb_item_desc" />
+
+    <CheckBox
+        android:id="@+id/filter_condition_cb_brand_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Brand Description"
+        app:layout_constraintBaseline_toBaselineOf="@+id/filter_condition_cb_brand_name"
+        app:layout_constraintStart_toStartOf="@+id/filter_condition_cb_shop_desc" />
+
+    <CheckBox
+        android:id="@+id/filter_condition_cb_brand_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Brand Name"
+        app:layout_constraintStart_toStartOf="@+id/filter_condition_cb_shop_name"
+        app:layout_constraintTop_toBottomOf="@+id/filter_condition_cb_shop_name" />
+
+    <CheckBox
+        android:id="@+id/filter_condition_cb_item_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text="Item Description"
+        app:layout_constraintBaseline_toBaselineOf="@+id/filter_condition_cb_item_name"
+        app:layout_constraintStart_toEndOf="@+id/filter_condition_cb_item_name" />
+
+    <CheckBox
+        android:id="@+id/filter_condition_cb_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Category"
+        app:layout_constraintStart_toStartOf="@+id/filter_condition_cb_brand_name"
+        app:layout_constraintTop_toBottomOf="@+id/filter_condition_cb_brand_name" />
+</android.support.constraint.ConstraintLayout>

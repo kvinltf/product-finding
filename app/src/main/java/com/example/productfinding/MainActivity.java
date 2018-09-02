@@ -21,10 +21,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +45,7 @@ import com.example.productfinding.util.ResultListUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -72,6 +75,11 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView.Adapter mRecycleAdapter;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    //filter condition
+    private Switch mAllConditionSwitch;
+    private CheckBox mItemNameCB, mItemDescCB, mShopNameCB, mShopDescCB, mBrandNameCB, mBrandDescCB, mCategoryCB;
+    private FilterCondition filterCondition = new FilterCondition();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -138,6 +146,7 @@ public class MainActivity extends AppCompatActivity
 
         mMoreButton = findViewById(R.id.search_iv_more);
         mMoreButton.setOnClickListener(v -> showPopup(v));
+
     }
 
     public void showPopup(View v) {
@@ -163,6 +172,7 @@ public class MainActivity extends AppCompatActivity
         try {
             jsonObject.put("action", "searchall");
             jsonObject.put("user_search", userSearch);
+            jsonObject.put("search_condition", (Object) new JSONArray(filterCondition.toArray()));
         } catch (JSONException e) {
             Log.w(TAG, "getCatalogList: Error while putting jsonObject:", e.getCause());
             e.printStackTrace();
@@ -203,20 +213,26 @@ public class MainActivity extends AppCompatActivity
 
         Intent _intent;
         switch (item.getItemId()) {
+/*
             case R.id.nav_history:
-                _intent = new Intent(this,CreateBrandActivity.class);
+                _intent = new Intent(this, CreateBrandActivity.class);
                 startActivity(_intent);
                 return true;
+*/
             case R.id.nav_logout:
                 signOut();
                 return true;
+/*
             case R.id.nav_setting:
                 Toast.makeText(this, "Setting", Toast.LENGTH_SHORT).show();
                 return true;
+*//*
+
             case R.id.nav_map:
                 _intent = new Intent(getApplicationContext(), MapActivity.class);
                 startActivity(_intent);
                 return true;
+*/
             case R.id.nav_profile:
 //                Toast.makeText(this, "Profile", Toast.LENGTH_SHORT).show();
                 _intent = new Intent(this, UserProfileActivity.class);
@@ -224,7 +240,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(_intent);
                 return true;
             case R.id.nav_add_item:
-                _intent = new Intent(this,CreateItemActivity.class);
+                _intent = new Intent(this, CreateItemActivity.class);
                 startActivity(_intent);
                 return true;
         }
@@ -363,6 +379,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.main_menu_distance:
                 createPopUpSeekBar();
                 return true;
+            case R.id.main_menu_filter_condition:
+                createPopupFilterConditionDialog();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -421,5 +440,159 @@ public class MainActivity extends AppCompatActivity
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
+    }
+
+    private void createPopupFilterConditionDialog() {
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle("Search Filter Condition")
+                .setView(R.layout.filter_condition_layout)
+                .setPositiveButton("OK", null)
+                .create();
+        alertDialog.show();
+
+        mItemNameCB = alertDialog.findViewById(R.id.filter_condition_cb_item_name);
+        mItemDescCB = alertDialog.findViewById(R.id.filter_condition_cb_item_desc);
+        mShopNameCB = alertDialog.findViewById(R.id.filter_condition_cb_shop_name);
+        mShopDescCB = alertDialog.findViewById(R.id.filter_condition_cb_shop_desc);
+        mBrandNameCB = alertDialog.findViewById(R.id.filter_condition_cb_brand_name);
+        mBrandDescCB = alertDialog.findViewById(R.id.filter_condition_cb_brand_desc);
+        mCategoryCB = alertDialog.findViewById(R.id.filter_condition_cb_category);
+
+        mItemNameCB.setChecked(filterCondition.isItemName());
+        mItemDescCB.setChecked(filterCondition.isItemDesc());
+        mShopNameCB.setChecked(filterCondition.isShopName());
+        mShopDescCB.setChecked(filterCondition.isShopDesc());
+        mBrandNameCB.setChecked(filterCondition.isBrandName());
+        mBrandDescCB.setChecked(filterCondition.isBrandDesc());
+        mCategoryCB.setChecked(filterCondition.isCategory());
+
+        mItemNameCB.setOnClickListener(v -> {
+            filterCondition.setItemName(mItemNameCB.isChecked());
+        });
+        mItemDescCB.setOnClickListener(v -> {
+            filterCondition.setItemDesc(mItemDescCB.isChecked());
+        });
+        mShopNameCB.setOnClickListener(v -> {
+            filterCondition.setShopName(mShopNameCB.isChecked());
+        });
+        mShopDescCB.setOnClickListener(v -> {
+            filterCondition.setShopDesc(mShopDescCB.isChecked());
+        });
+        mBrandNameCB.setOnClickListener(v -> {
+            filterCondition.setBrandName(mBrandNameCB.isChecked());
+        });
+        mBrandDescCB.setOnClickListener(v -> {
+            filterCondition.setBrandDesc(mBrandDescCB.isChecked());
+        });
+        mCategoryCB.setOnClickListener(v -> {
+            filterCondition.setCategory(mCategoryCB.isChecked());
+        });
+    }
+
+
+}
+
+
+class FilterCondition {
+
+    private boolean itemName;
+    private boolean itemDesc;
+    private boolean shopName;
+    private boolean shopDesc;
+    private boolean brandName;
+    private boolean brandDesc;
+    private boolean category;
+
+    public FilterCondition() {
+        itemName = true;
+        itemDesc = true;
+        shopName = true;
+        shopDesc = true;
+        brandName = true;
+        brandDesc = true;
+        category = true;
+    }
+
+    public boolean isItemName() {
+        return itemName;
+    }
+
+    public void setItemName(boolean itemName) {
+        this.itemName = itemName;
+    }
+
+    public boolean isItemDesc() {
+        return itemDesc;
+    }
+
+    public void setItemDesc(boolean itemDesc) {
+        this.itemDesc = itemDesc;
+    }
+
+    public boolean isShopName() {
+        return shopName;
+    }
+
+    public void setShopName(boolean shopName) {
+        this.shopName = shopName;
+    }
+
+    public boolean isShopDesc() {
+        return shopDesc;
+    }
+
+    public void setShopDesc(boolean shopDesc) {
+        this.shopDesc = shopDesc;
+    }
+
+    public boolean isBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(boolean brandName) {
+        this.brandName = brandName;
+    }
+
+    public boolean isBrandDesc() {
+        return brandDesc;
+    }
+
+    public void setBrandDesc(boolean brandDesc) {
+        this.brandDesc = brandDesc;
+    }
+
+    public boolean isCategory() {
+        return category;
+    }
+
+    public void setCategory(boolean category) {
+        this.category = category;
+    }
+
+    public ArrayList<String> toArray() {
+        ArrayList<String> strings = new ArrayList<>();
+
+        if (isItemName()) {
+            strings.add("item_name");
+        }
+        if (isItemDesc()) {
+            strings.add("item_desc");
+        }
+        if (isShopName()) {
+            strings.add("shop_name");
+        }
+        if (isShopDesc()) {
+            strings.add("shop_desc");
+        }
+        if (isBrandName()) {
+            strings.add("brand_name");
+        }
+        if (isBrandDesc()) {
+            strings.add("brand_desc");
+        }
+        if (isCategory()) {
+            strings.add("category");
+        }
+        return strings;
     }
 }
