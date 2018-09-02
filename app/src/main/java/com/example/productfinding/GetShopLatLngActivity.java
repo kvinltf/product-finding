@@ -1,6 +1,6 @@
 package com.example.productfinding;
 
-import android.location.Address;
+import android.content.Intent;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
@@ -13,6 +13,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.productfinding.util.LocationUtil;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -21,20 +27,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.IOException;
-import java.util.List;
-
 public class GetShopLatLngActivity extends AppCompatActivity implements
         GoogleMap.OnMarkerDragListener,
         GoogleMap.OnMarkerClickListener,
         GoogleMap.OnMapLongClickListener,
         OnMapReadyCallback {
 
+    int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private static final String TAG = "GetShopLatLngActivity";
     private GoogleMap mMap;
     private Marker mShopMaker;
-    private double mLat;
-    private double mLng;
+    private double mLat, mLng;
     private Location mCurrentLocation;
 
     private EditText mSearchET;
@@ -49,7 +52,7 @@ public class GetShopLatLngActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_get_shop_lat_lng);
         mCurrentLocation = new LocationUtil(this, this).getMyCurrentLocation();
-
+        mLat = mLng = 0;
         mSearchET = findViewById(R.id.get_shop_et_search);
         mSearchIV = findViewById(R.id.get_shop_iv_search);
         mNextBtn = findViewById(R.id.get_shop_btn_next);
@@ -62,20 +65,33 @@ public class GetShopLatLngActivity extends AppCompatActivity implements
         geocoder = new Geocoder(this);
 
 
-        mSearchIV.setOnClickListener(v -> {
-            String name = mSearchET.getText().toString();
+        mSearchET.setOnClickListener(v -> {
             try {
-                List<Address> addressList = geocoder.getFromLocationName(name, 1);
+                //Filter The Result only In Malaysia
+                AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                        .setCountry("MY")
+                        .build();
 
-                for (Address address : addressList) {
-                    Log.d(TAG, "onCreate: ADDRESSLIST::" + address.toString());
-
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+                Intent intent =
+                        new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY).setFilter(typeFilter)
+                                .build(this);
+                startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+            } catch (GooglePlayServicesRepairableException e) {
+                // TODO: Handle the error.
+            } catch (GooglePlayServicesNotAvailableException e) {
+                // TODO: Handle the error.
             }
         });
 
+        mNextBtn.setOnClickListener(v -> {
+            Intent i = new Intent(this, AddNewShop.class);
+            i.putExtra("shop_name", mNameTV.getText().toString().trim());
+            i.putExtra("lat", mLat);
+            i.putExtra("lng", mLng);
+
+            startActivity(i);
+
+        });
     }
 
     @Override
@@ -124,7 +140,8 @@ public class GetShopLatLngActivity extends AppCompatActivity implements
             float currentZoom = mMap.getCameraPosition().zoom;
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pointOfInterest.latLng, currentZoom > 14f ? currentZoom : 14f));
             mNameTV.setText(pointOfInterest.name);
-            mLatLngTV.setText(pointOfInterest.latLng.toString());
+            setLatLng(pointOfInterest.latLng);
+            mLatLngTV.setText(getLatLng().toString());
         });
     }
 
@@ -136,14 +153,43 @@ public class GetShopLatLngActivity extends AppCompatActivity implements
         float currentZoom = mMap.getCameraPosition().zoom;
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, currentZoom > 14f ? currentZoom : 14f));
         mNameTV.setText("");
-        mLatLngTV.setText(latLng.toString());
+        setLatLng(latLng);
+        mLatLngTV.setText(getLatLng().toString());
 
-        try {
-            List<Address> addressList = geocoder.getFromLocation(latLng.latitude,latLng.longitude,1);
-            Log.d(TAG, "onMapLongClick: ADDRESS::"+addressList.get(0).toString());
-        } catch (IOException e) {
-            e.printStackTrace();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                Log.i(TAG, "Place: " + place.getName());
+
+                mMap.clear();
+                mShopMaker = mMap.addMarker(new MarkerOptions().position(place.getLatLng()).draggable(true));
+                float currentZoom = mMap.getCameraPosition().zoom;
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(place.getLatLng(), currentZoom > 16f ? currentZoom : 16f));
+                mNameTV.setText(place.getName());
+                setLatLng(place.getLatLng());
+                mLatLngTV.setText(getLatLng().toString());
+
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(this, data);
+                // TODO: Handle the error.
+                Log.i(TAG, status.getStatusMessage());
+
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
         }
+    }
 
+    private void setLatLng(LatLng latLng) {
+        mLat = latLng.latitude;
+        mLng = latLng.longitude;
+    }
+
+    private LatLng getLatLng() {
+        return new LatLng(mLat, mLng);
     }
 }
