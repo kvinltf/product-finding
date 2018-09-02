@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity
                 clearRecycleView();
                 mSearchResult.setText(mUserSearchText.getText().toString());
                 KeyboardUtil.hideSoftKeyboard(this);
-                getCatalogList(mUserSearchText.getText().toString());
+                getCatalogList(mUserSearchText.getText().toString().trim());
             }
         });
 
@@ -204,7 +204,8 @@ public class MainActivity extends AppCompatActivity
         Intent _intent;
         switch (item.getItemId()) {
             case R.id.nav_history:
-                Toast.makeText(this, "History Selected", Toast.LENGTH_SHORT).show();
+                _intent = new Intent(this,CreateBrandActivity.class);
+                startActivity(_intent);
                 return true;
             case R.id.nav_logout:
                 signOut();
@@ -222,8 +223,10 @@ public class MainActivity extends AppCompatActivity
                 IntentUtil.setLoginUserForIntent(_intent, mLoginUser);
                 startActivity(_intent);
                 return true;
-
-
+            case R.id.nav_add_item:
+                _intent = new Intent(this,CreateItemActivity.class);
+                startActivity(_intent);
+                return true;
         }
         return true;
     }

@@ -65,7 +65,9 @@
         <activity
             android:name=".AddItemToShopActivity"
             android:configChanges="orientation"
-            android:windowSoftInputMode="stateHidden"></activity>
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".CreateBrandActivity" />
+        <activity android:name=".CreateItemActivity"></activity>
     </application>
 
 </manifest>
