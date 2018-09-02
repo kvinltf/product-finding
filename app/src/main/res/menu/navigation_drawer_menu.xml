@@ -4,7 +4,7 @@
         <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/ic_person_black_24dp"
-            android:title="@string/txt_profile" />
+            android:title="@string/txt_manage_shop" />
         <!--        <item
                     android:id="@+id/nav_map"
                     android:icon="@drawable/ic_map_black_24dp"
@@ -25,6 +25,7 @@
 
         <item
             android:id="@+id/nav_add_shop"
+            android:icon="@drawable/ic_add_shopping_cart_black_24dp"
             android:title="Add New Shop" />
         <item
             android:id="@+id/nav_logout"

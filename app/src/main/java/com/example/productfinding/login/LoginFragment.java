@@ -120,7 +120,7 @@ public class LoginFragment extends Fragment {
 
         showProgressBar(true);
 
-        String email = mEmail.getText().toString();
+        String email = mEmail.getText().toString().trim();
         String password = mPassword.getText().toString();
         String url = getString(R.string.url_user);
         JSONObject jsonObject = new JSONObject();
@@ -206,15 +206,15 @@ public class LoginFragment extends Fragment {
      */
     private boolean isInputValid() {
         Log.d(TAG, "isInputValid: Checking The User's Input Validity");
-        if (mEmail.getText().toString().isEmpty()) {
+        if (mEmail.getText().toString().trim().isEmpty()) {
             mEmail.setError(getString(R.string.err_field_required));
             mEmail.requestFocus();
             return false;
-        } else if (!EmailUtil.isValidEmail(mEmail.getText().toString())) {
+        } else if (!EmailUtil.isValidEmail(mEmail.getText().toString().trim())) {
             mEmail.setError(getString(R.string.err_wrong_email_format));
             mEmail.requestFocus();
             return false;
-        } else if (mPassword.getText().toString().isEmpty()) {
+        } else if (mPassword.getText().toString().trim().isEmpty()) {
             mPassword.setError(getString(R.string.err_field_required));
             mPassword.requestFocus();
             return false;

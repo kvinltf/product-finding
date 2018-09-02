@@ -1,5 +1,6 @@
 package com.example.productfinding;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -51,7 +52,7 @@ public class AddItemToShopActivity extends AppCompatActivity {
     private TextView shopNameTV;
     private EditText filterEditText;
     private ImageView resetImageView;
-    private Button addItemBtn;
+    private Button addItemBtn, mNewItemBtn;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mRecycleAdapter;
@@ -69,6 +70,10 @@ public class AddItemToShopActivity extends AppCompatActivity {
 
         filterEditText = findViewById(R.id.shop_profile_add_item_filter_text);
 
+        mNewItemBtn = findViewById(R.id.shop_profile_add_item_btn_new_item);
+        mNewItemBtn.setOnClickListener(v -> {
+            startActivity(new Intent(this, CreateItemActivity.class));
+        });
 
         resetImageView = findViewById(R.id.shop_profile_add_item_reset_btn);
         resetImageView.setOnClickListener(v -> filterEditText.setText(""));

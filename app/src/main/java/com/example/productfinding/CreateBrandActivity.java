@@ -63,6 +63,7 @@ public class CreateBrandActivity extends AppCompatActivity {
                         if (response.getString("status").equalsIgnoreCase("Success")) {
                             mBrandName.setText("");
                             mBrandDescription.setText("");
+                            finish();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
