@@ -35,6 +35,10 @@ public class CreateBrandActivity extends AppCompatActivity {
 
         mSubmitButton.setOnClickListener(v ->
         {
+            if (mBrandName.getText().toString().trim().isEmpty()) {
+                mBrandName.setError("This Field is Required");
+                return;
+            }
             setButtonAvailability(mSubmitButton, false);
             addNewBrand(mBrandName.getText().toString(), mBrandDescription.getText().toString());
         });

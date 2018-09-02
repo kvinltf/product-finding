@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Button;
@@ -84,6 +85,13 @@ public class GetShopLatLngActivity extends AppCompatActivity implements
         });
 
         mNextBtn.setOnClickListener(v -> {
+            if (mLat == 0 || mLng == 0) {
+                new AlertDialog.Builder(this)
+                        .setTitle("You Must Select a Place to Add Shop")
+                        .setPositiveButton("OK", null).show();
+                return;
+            }
+
             Intent i = new Intent(this, AddNewShop.class);
             i.putExtra("shop_name", mNameTV.getText().toString().trim());
             i.putExtra("lat", mLat);

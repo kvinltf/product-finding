@@ -18,12 +18,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.productfinding.R;
 import com.example.productfinding.model.ResponseObject;
-import com.example.productfinding.model.User;
 import com.example.productfinding.util.EmailUtil;
 import com.example.productfinding.util.KeyboardUtil;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.json.JSONException;
@@ -115,7 +111,7 @@ public class RegisterFragment extends Fragment {
                 response -> {
                     try {
                         final ObjectMapper objectMapper = new ObjectMapper();
-                        ResponseObject responseObject = objectMapper.readValue(response.toString(),ResponseObject.class);
+                        ResponseObject responseObject = objectMapper.readValue(response.toString(), ResponseObject.class);
 
                         //Request SUCCESS
                         if (responseObject.isStatusSuccess()) {
@@ -189,6 +185,7 @@ public class RegisterFragment extends Fragment {
         } else if (!mRePassword.getText().toString().equalsIgnoreCase(mPassword.getText().toString())) {
             mRePassword.setError(getString(R.string.err_repassword));
             mRePassword.requestFocus();
+            return false;
         }
         return true;
     }
